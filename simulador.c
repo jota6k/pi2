@@ -49,14 +49,14 @@ void Ler_Arquivo_Memoria(struct instrucao *memoria_instrucoes) {
         memoria_instrucoes[indice_atual].opcode = valor_opcode;
 
         switch (valor_opcode) {
-            case 0: // Instruções do TIPO R (ADD, SUB, AND, OR)
+            case 0: // TIPO R (ADD, SUB, AND, OR)
                 memoria_instrucoes[indice_atual].rs = (int)strtol(str_rs, NULL, 2);
                 memoria_instrucoes[indice_atual].rt = (int)strtol(str_rt, NULL, 2);
                 memoria_instrucoes[indice_atual].rd = (int)strtol(str_rd, NULL, 2);
                 memoria_instrucoes[indice_atual].funct = (int)strtol(str_funct, NULL, 2);
                 break;
 
-            case 2: // Instruções do TIPO J (JUMP)
+            case 2: // TIPO J (JUMP)
                 memoria_instrucoes[indice_atual].addr = (int)strtol(str_addr, NULL, 2);
                 break;
 
@@ -92,4 +92,37 @@ void Ler_Arquivo_Memoria(struct instrucao *memoria_instrucoes) {
 
     fclose(ptr_arquivo);
     printf("Memoria de instrucoes processada com exito.\n");
+}
+
+void inicializar_registradores(int banco_registradores[]) {
+    for (int i = 0; i < NUM_REGISTRADORES; i++) {
+        banco_registradores[i] = 0;
+    }
+}
+
+int ler_registrador(const int banco_registradores[], int indice) {
+    if (indice >= 0 && indice < NUM_REGISTRADORES) {
+        return banco_registradores[indice];
+    }
+    printf("Erro na Leitura: Indice de registrador invalido ($%d).\n", indice);
+    return 0;
+}
+
+void escrever_registrador(int banco_registradores[], int indice, int valor) {
+    if (indice >= 0 && indice < NUM_REGISTRADORES) {
+        banco_registradores[indice] = valor;
+    } else {
+        printf("Erro na Escrita: Indice de registrador invalido ($%d).\n", indice);
+    }
+}
+
+void imprimir_registradores(const int banco_registradores[]) {
+    printf("\n-------------- BANCO DE REGISTRADORES --------------\n");
+    for (int i = 0; i < NUM_REGISTRADORES; i++) {
+        printf("[$%d]: %-6d\t", i, banco_registradores[i]);
+        if ((i + 1) % 4 == 0) {
+            printf("\n");
+        }
+    }
+    printf("----------------------------------------------------\n\n");
 }
