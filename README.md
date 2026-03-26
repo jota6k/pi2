@@ -1,0 +1,2 @@
+# pi2
+MINI MIPS 8 BITS
