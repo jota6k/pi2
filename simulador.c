@@ -3,6 +3,8 @@
 #include <string.h>
 #include "simulador.h"
 
+// Leitura de Arquivos .mem
+
 void Ler_Arquivo_Memoria(struct instrucao *memoria_instrucoes) {
     char caminho_arquivo[128];
     printf("Informe o nome/caminho do arquivo .mem: ");
@@ -94,6 +96,8 @@ void Ler_Arquivo_Memoria(struct instrucao *memoria_instrucoes) {
     printf("Memoria de instrucoes processada com exito.\n");
 }
 
+// Banco de Registradores
+
 void inicializar_registradores(int banco_registradores[]) {
     for (int i = 0; i < NUM_REGISTRADORES; i++) {
         banco_registradores[i] = 0;
@@ -125,4 +129,66 @@ void imprimir_registradores(const int banco_registradores[]) {
         }
     }
     printf("----------------------------------------------------\n\n");
+}
+
+// Program Counter (PC)
+
+void inicializar_PC(int *PC) {
+    *PC = 0; // Inicializa o contador de programa em 0
+}
+
+void incrementar_PC(int *PC) {
+    (*PC)++; // Atualização padrão (PC = PC + 1)
+}
+
+void atualizar_PC_salto(int *PC, int novo_endereco) {
+    // Validação para o salto
+    if (novo_endereco >= 0 && novo_endereco < 256) {
+        *PC = novo_endereco; // Atualização para realizar JUMP ou BEQ
+    } else {
+        printf("Erro de Execucao: Tentativa de salto para endereco invalido (%d).\n", novo_endereco);
+    }
+}
+
+void imprimir_PC(int PC) {
+    printf("PC Atual: [%d]\n", PC);
+}
+
+// Unidade Lógica Aritimética (ULA)
+
+int operacao_ULA(int operando_A, int operando_B, int controle_ULA, int *flag_zero) {
+    int resultado = 0;
+
+    switch (controle_ULA) {
+        case 0: // ADD
+            resultado = operando_A + operando_B;
+            break;
+        case 2: // SUB
+            resultado = operando_A - operando_B;
+            break;
+        case 4: // AND
+            resultado = operando_A & operando_B;
+            break;
+        case 5: // OR
+            resultado = operando_A | operando_B;
+            break;
+        default:
+            printf("Erro: Sinal de controle invalido (%d).\n", controle_ULA);
+            resultado = 0;
+            break;
+    }
+
+    // Atualiza a flag Zero (se o resultado for 0 a flag fica 1/Verdadeira)
+    if (resultado == 0) {
+        *flag_zero = 1;
+    } else {
+        *flag_zero = 0;
+    }
+
+    // Verificar possível overflow
+    if (resultado > 127 || resultado < -128) {
+        printf("Overflow! O resultado (%d) é superior à capacidade do MINI MIPS (8 bits).\n", resultado);
+    }
+
+    return resultado;
 }
