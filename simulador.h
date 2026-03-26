@@ -1,6 +1,8 @@
 #ifndef BIBLIOTECA_H
 #define BIBLIOTECA_H
 
+#define NUM_REGISTRADORES 8
+
 struct instrucao {
     char inst_char[17]; // 16 bits da instrução + "\0"
     int opcode;         // Operação principal
@@ -12,7 +14,7 @@ struct instrucao {
     int addr;           // Endereço de salto (para instruções tipo J)
 };
 
-// Estrutura para a memória de dados (Preparação para uso futuro)
+// Estrutura para a memória de dados (Para uso futuro)
 struct mem_dados {
     int dado;
 };
@@ -20,15 +22,21 @@ struct mem_dados {
 // Estrutura para salvar o estado do simulador (Step/Back)
 struct estado_salvo {
     int copia_PC;
-    int copia_banco_de_registradores[8];
+    int copia_banco_de_registradores[NUM_REGISTRADORES];
     struct mem_dados copia_memoria[256];
 };
 
-// PROTÓTIPOS DAS FUNÇÕES
+// FUNÇÕES
 
-// Função desenvolvida na Sprint 1 para ler o arquivo .mem
+// Função para ler o arquivo .mem
 void Ler_Arquivo_Memoria(struct instrucao *memoria_instrucoes);
 
-// (Os protótipos das próximas etapas entrarão aqui conforme formos avançando)
+// Funções do Banco de Registradores
+void inicializar_registradores(int banco_registradores[]);
+int ler_registrador(const int banco_registradores[], int indice);
+void escrever_registrador(int banco_registradores[], int indice, int valor);
+void imprimir_registradores(const int banco_registradores[]);
+
+// (As próximas etapas entrarão aqui conforme formos avançando)
 
 #endif
