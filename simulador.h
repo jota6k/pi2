@@ -37,6 +37,15 @@ int ler_registrador(const int banco_registradores[], int indice);
 void escrever_registrador(int banco_registradores[], int indice, int valor);
 void imprimir_registradores(const int banco_registradores[]);
 
+// Funções do Program Counter (PC)
+void inicializar_PC(int *PC);
+void incrementar_PC(int *PC);
+void atualizar_PC_salto(int *PC, int novo_endereco);
+void imprimir_PC(int PC);
+
+// Função da Unidade Lógica e Aritmética (ULA)
+int operacao_ULA(int operando_A, int operando_B, int controle_ULA, int *flag_zero);
+
 // (As próximas etapas entrarão aqui conforme formos avançando)
 
 #endif
