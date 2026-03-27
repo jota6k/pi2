@@ -14,7 +14,7 @@ struct instrucao {
     int addr;           // Endereço de salto (para instruções tipo J)
 };
 
-// Estrutura para a memória de dados (Para uso futuro)
+// Estrutura para a memória de dados
 struct mem_dados {
     int dado;
 };
