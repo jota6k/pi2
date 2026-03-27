@@ -12,7 +12,7 @@ void Ler_Arquivo_Memoria(struct instrucao *memoria_instrucoes) {
 
     FILE *ptr_arquivo = fopen(caminho_arquivo, "r");
     if (ptr_arquivo == NULL) {
-        printf("Arquivo '%s' nao foi localizado.\n", caminho_arquivo);
+        printf("Arquivo "%s" nao foi localizado.\n", caminho_arquivo);
         return;
     }
 
