@@ -14,7 +14,7 @@ void leitura_arquivo_mem(int memoria[]) {
     char linha[17];
 
     while (fscanf(arquivo, "%s", &memoria[i]) != EOF) {
-        memoria[i] = (int)strol(linha, NULL, 2);
+        memoria[i] = (int)strtol(linha, NULL, 2);
         i++;
     }
 
@@ -26,3 +26,20 @@ void inicializar_registradores(int registradores[]) {
         registradores[i] = 0;
     }
 }
+int ler_reg(int registradores[], int indice) {
+    return registradores[indice];
+}
+void escrever_reg(int registradores[], int indice, int valor) {
+    registradores[indice] = valor;
+}
+
+void executar_programa(int memoria[], int registradores[]) {         //Coloquei como uma variável que controla qual instrução vai ser executada.
+    int PC = 0; 
+    while (PC < 256) {
+        int instrucao = memoria[PC];
+        printf("PC = %d | Instrucao = %d\n", PC, instrucao);
+        PC++;
+    }
+}
+
+
