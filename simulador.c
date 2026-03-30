@@ -42,4 +42,36 @@ void executar_programa(int memoria[], int registradores[]) {         //Coloquei 
     }
 }
 
+int ULA(int A, int B, int controle, int flag) {
+    int resultado = 0;
 
+    switch(controle) {
+        case 0:
+            resultado = A + B;
+            break;
+        case 2:
+            resultado = A - B;
+            break;
+        case 4:
+            resultado = A & B;
+            break;
+        case 5:
+            resultado = A | B;
+            break;
+        default:
+            resultado = 0;
+            break;
+    }
+
+    if (resultado == 0) {
+        flag = 1;
+    } else {
+        flag = 0;
+    }
+
+    if (resultado > 127 || resultado < -128) {
+        printf("Overflow.\n");
+    }
+
+    return resultado;
+}
