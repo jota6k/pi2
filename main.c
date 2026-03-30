@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "simulador.h"
+#include <stdlib.h>
 
 int main() {
     int memoria[256];
@@ -23,19 +24,19 @@ switch(op) {
         break;
     case 2:
         for (int i = 0; i < 256; i++) {
-           printf("Mem[%d] = %d\n", i, memoria[i]);
-        }
-           break;
+        printf("Mem[%d] = %d\n", i, memoria[i]);
+    }
+        break;
     case 3:
         for (int i = 0; i < 8; i++) {
-           printf("R%d = %d\n", i, registradores[i]);
-        }
+        printf("R%d = %d\n", i, registradores[i]);
+    }
         break;
     case 0:
-           printf("Programa encerrado!\n");
-            break;
+        printf("Programa encerrado!\n");
+        break;
     default:
-       printf("Opcao invalida!\n");
+        printf("Opcao invalida!\n");
         }
     } while (op != 0);
     return 0;
