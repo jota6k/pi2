@@ -33,16 +33,46 @@ void escrever_reg(int registradores[], int indice, int valor) {
     registradores[indice] = valor;
 }
 
-void executar_programa(int memoria[], int registradores[]) {         //Coloquei como uma variável que controla qual instrução vai ser executada.
-    int PC = 0; 
+void executar_programa(int memoria[], int registradores[]) {
+    int PC = 0;
     while (PC < 256) {
         int instrucao = memoria[PC];
-        printf("PC = %d | Instrucao = %d\n", PC, instrucao);
+        int opcode = (instrucao >> 12) & 0xF;
+        int rs = (instrucao >> 9)  & 0x7;
+        int rt = (instrucao >> 6)  & 0x7;
+        int rd = (instrucao >> 3)  & 0x7;
+        int imm = instrucao & 0x3F;
+
+        printf("\nPC=%d | opcode=%d\n", PC, opcode);
+        switch(opcode) {                                //switch para add, sub, addi, lw e sw
+            case 0:
+                registradores[rd] = registradores[rs] + registradores[rt];
+                printf("ADD r%d = r%d + r%d\n", rd, rs, rt);
+                break;
+            case 1: 
+                registradores[rd] = registradores[rs] - registradores[rt];
+                printf("SUB r%d = r%d - r%d\n", rd, rs, rt);
+                break;
+            case 2:
+                registradores[rt] = registradores[rs] + imm;
+                printf("ADDI r%d = r%d + %d\n", rt, rs, imm);
+                break;
+            case 3:
+                registradores[rt] = memoria[registradores[rs] + imm];
+                printf("LW r%d = MEM[%d]\n", rt, registradores[rs] + imm);
+                break;
+            case 4: 
+                memoria[registradores[rs] + imm] = registradores[rt];
+                printf("SW MEM[%d] = r%d\n", registradores[rs] + imm, rt);
+                break;
+            default:
+                printf("Instrucao invalida!\n");
+                break;
+        }
         PC++;
     }
 }
-
-int ULA(int A, int B, int controle, int flag) {
+int ULA(int A, int B, int controle, int *flag) {
     int resultado = 0;
 
     switch(controle) {
@@ -64,9 +94,9 @@ int ULA(int A, int B, int controle, int flag) {
     }
 
     if (resultado == 0) {
-        flag = 1;
+        *flag = 1;
     } else {
-        flag = 0;
+        *flag = 0;
     }
 
     if (resultado > 127 || resultado < -128) {
