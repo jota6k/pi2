@@ -47,34 +47,41 @@ fclose(arquivo);
 
 void executar_programa(int memoria_instrucao[], int memoria_dados[], int registradores[]) {
     int PC = 0;
+    int total = 0, aritmeticas = 0, memoria_acesso = 0;
     while (PC < 256) {
-        int instrucao = memoria[PC];
+        int instrucao = memoria_instrucao[PC];
         int opcode = (instrucao >> 12) & 0xF;
         int rs = (instrucao >> 9)  & 0x7;
         int rt = (instrucao >> 6)  & 0x7;
         int rd = (instrucao >> 3)  & 0x7;
         int imm = instrucao & 0x3F;
-
+    
+        total++;    
         printf("\nPC=%d | opcode=%d\n", PC, opcode);
         switch(opcode) {                                //switch para add, sub, addi, lw e sw
             case 0:
+                aritmeticas++;
                 registradores[rd] = registradores[rs] + registradores[rt];
                 printf("ADD r%d = r%d + r%d\n", rd, rs, rt);
                 break;
-            case 1: 
+            case 1:
+                aritmeticas++;
                 registradores[rd] = registradores[rs] - registradores[rt];
                 printf("SUB r%d = r%d - r%d\n", rd, rs, rt);
                 break;
             case 2:
+                aritmeticas++;
                 registradores[rt] = registradores[rs] + imm;
                 printf("ADDI r%d = r%d + %d\n", rt, rs, imm);
                 break;
             case 3:
-                registradores[rt] = memoria[registradores[rs] + imm];
+                memoria_acesso++;
+                registradores[rt] = memoria_dados[registradores[rs] + imm];
                 printf("LW r%d = MEM[%d]\n", rt, registradores[rs] + imm);
                 break;
             case 4: 
-                memoria[registradores[rs] + imm] = registradores[rt];
+                memoria_acesso++;
+                memoria_dados[registradores[rs] + imm] = registradores[rt];
                 printf("SW MEM[%d] = r%d\n", registradores[rs] + imm, rt);
                 break;
             default:
@@ -83,6 +90,8 @@ void executar_programa(int memoria_instrucao[], int memoria_dados[], int registr
         }
         PC++;
     }
+    printf("\n -Estatisticas- \n");
+    printf("Total de instrucoes: %d\nAritmeticas: %d\nAcesso a memoria: %d\n", total, aritmeticas, memoria_acesso);
 }
 int ULA(int A, int B, int controle, int *flag) {
     int resultado = 0;
