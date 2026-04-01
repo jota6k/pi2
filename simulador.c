@@ -13,11 +13,10 @@ void leitura_arquivo_mem(int memoria[]) {
     int i = 0;
     char linha[17];
 
-    while (fscanf(arquivo, "%s", &memoria[i]) != EOF) {
-        memoria[i] = (int)strtol(linha, NULL, 2);
-        i++;
+    while (fscanf(arquivo, "%s", linha) != EOF) {
+    memoria[i] = (int)strtol(linha, NULL, 2);
+    i++;
     }
-
     fclose(arquivo);
 }
 
@@ -33,7 +32,20 @@ void escrever_reg(int registradores[], int indice, int valor) {
     registradores[indice] = valor;
 }
 
-void executar_programa(int memoria[], int registradores[]) {
+void leitura_arquivos_dados(int memoria_dados[]) {
+int i = 0;
+    FILE *arquivo = fopen("dados.dat", "r");
+if(arquivo == NULL){
+    printf("Erro ao abrir arquivo.\n");
+    return;
+}
+while(fscanf(arquivo, "%d", &memoria_dados[i]) != EOF) {
+    i++;
+}
+fclose(arquivo);
+}
+
+void executar_programa(int memoria_instrucao[], int memoria_dados[], int registradores[]) {
     int PC = 0;
     while (PC < 256) {
         int instrucao = memoria[PC];
