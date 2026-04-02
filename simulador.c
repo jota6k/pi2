@@ -55,10 +55,18 @@ void executar_programa(int memoria_instrucao[], int memoria_dados[], int registr
         int rt = (instrucao >> 6)  & 0x7;
         int rd = (instrucao >> 3)  & 0x7;
         int imm = instrucao & 0x3F;
-    
+        int addr = instrucao & 0xFF;
+
+        if (imm >= 32) { // <---------- extensao de sinal
+            imm = imm - 64; 
+        }
+
         total++;    
         printf("\nPC=%d | opcode=%d\n", PC, opcode);
-        switch(opcode) {                                //switch para add, sub, addi, lw e sw
+
+        int flag_zero = 0;
+    
+        switch(opcode) {
             case 0:
                 aritmeticas++;
                 registradores[rd] = registradores[rs] + registradores[rt];
@@ -84,6 +92,15 @@ void executar_programa(int memoria_instrucao[], int memoria_dados[], int registr
                 memoria_dados[registradores[rs] + imm] = registradores[rt];
                 printf("SW MEM[%d] = r%d\n", registradores[rs] + imm, rt);
                 break;
+            case 8:
+                ULA(registradores[rs], registradores[rt], 2, &flag_zero);
+                if (flag_zero) {
+                    PC += imm;
+                }
+                break;
+            case 2:
+                PC = addr - 1;
+                break;
             default:
                 printf("Instrucao invalida!\n");
                 break;
@@ -93,6 +110,7 @@ void executar_programa(int memoria_instrucao[], int memoria_dados[], int registr
     printf("\n -Estatisticas- \n");
     printf("Total de instrucoes: %d\nAritmeticas: %d\nAcesso a memoria: %d\n", total, aritmeticas, memoria_acesso);
 }
+
 int ULA(int A, int B, int controle, int *flag) {
     int resultado = 0;
 
@@ -125,4 +143,19 @@ int ULA(int A, int B, int controle, int *flag) {
     }
 
     return resultado;
+}
+
+void salvar_arquivo_dat(int memoria_dados[]) {
+    FILE *arquivo = fopen("saidaDados.dat", "w");
+    
+    if(arquivo == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        return;
+    }
+    
+    for (int i = 0; i < 256; i++) {
+        fprintf(arquivo, "%d\n", memoria_dados[i]);
+    }
+    
+    fclose(arquivo);
 }
