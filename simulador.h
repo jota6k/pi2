@@ -17,3 +17,4 @@ void inicializar_registradores(int registradores[]);
 int ler_reg(int registradores[], int indice);
 void escrever_reg(int registradores[], int indice, int valor);
 void executar_programa(int memoria[], int registradores[]);
+void imprimir_memoria(int memoria[]);
