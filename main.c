@@ -40,4 +40,9 @@ switch(op) {
         }
     } while (op != 0);
     return 0;
+
+    // outro case de imprimir_memoria(memoria);
+    // case x:
+    //salvar_asm(memoria);
+    //break;
 }
