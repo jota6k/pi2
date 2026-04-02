@@ -164,6 +164,60 @@ void imprimir_memoria(int memoria[]) {
         printf("Mem[%d] = %d\n", i, memoria[i]);
     }
 }
-    
+    void salvar_asm(int memoria[]) {
+
+    FILE *arquivo = fopen("programa.asm", "w");
+
+    if (arquivo == NULL) {
+        printf("Erro ao criar arquivo ASM\n");
+        return;
+    }
+
+    for(int PC = 0; PC < 256; PC++) {
+
+        int instrucao = memoria[PC];
+
+        int opcode = (instrucao >> 12) & 0xF;
+        int rs = (instrucao >> 9) & 0x7;
+        int rt = (instrucao >> 6) & 0x7;
+        int rd = (instrucao >> 3) & 0x7;
+        int imm = instrucao & 0x3F;
+        int addr = instrucao & 0xFF;
+
+        switch(opcode) {
+
+        case 0:
+            fprintf(arquivo, "ADD R%d R%d R%d\n", rd, rs, rt);
+            break;
+
+        case 1:
+            fprintf(arquivo, "SUB R%d R%d R%d\n", rd, rs, rt);
+            break;
+
+        case 2:
+            fprintf(arquivo, "ADDI R%d R%d %d\n", rt, rs, imm);
+            break;
+
+        case 3:
+            fprintf(arquivo, "LW R%d %d(R%d)\n", rt, imm, rs);
+            break;
+
+        case 4:
+            fprintf(arquivo, "SW R%d %d(R%d)\n", rt, imm, rs);
+            break;
+
+        case 8:
+            fprintf(arquivo, "BEQ R%d R%d %d\n", rs, rt, imm);
+            break;
+
+        default:
+            fprintf(arquivo, "NOP\n");
+        }
+    }
+
+    fclose(arquivo);
+
+    printf("Arquivo programa.asm salvo!\n");
+}
     fclose(arquivo);
 }
