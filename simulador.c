@@ -62,7 +62,7 @@ struct decode campos(int instrucao){
     c.imm = instrucao & 0x3F;
     c.addr = instrucao & 0xFF;
 
-    if (c.imm >= 32) {
+    if (c.imm >= 32) { // < ------------ extensao de sinal
         c.imm -= 64;
     }
     return c;
@@ -203,7 +203,7 @@ void salvar_asm(int memoria[]) {
         int addr = instrucao & 0xFF;
         if (imm >= 32) imm -= 64;
         
-     switch(opcode) {
+    switch(opcode) {
             case 0:
                 switch(funct) {
                     case 0: fprintf(arquivo, "ADD R%d R%d R%d\n", rd, rs, rt); break;
@@ -240,4 +240,51 @@ void salvar_asm(int memoria[]) {
     }
     fclose(arquivo);
     printf("Arquivo programa.asm salvo!\n");
+}
+
+struct EstadoMaquina historico[999]; 
+int passo_atual = 0; 
+
+void salvar_estado(int PC_atual, int registradores[], int memoria_dados[]) {
+    historico[passo_atual].PC = PC_atual;
+    for(int i = 0; i < 8; i++) historico[passo_atual].registradores[i] = registradores[i];
+    for(int i = 0; i < 256; i++) historico[passo_atual].memoria_dados[i] = memoria_dados[i];
+}
+
+void step(int memoria_instrucao[], int memoria_dados[], int registradores[], int *PC, int *arit, int *mem) {
+    int instrucao_atual = fetch(memoria_instrucao, *PC);
+    
+    if (instrucao_atual == 0 || *PC >= 256) {
+        printf("Nao ha mais instrucoes para executar.\n");
+        return;
+    }
+
+    salvar_estado(*PC, registradores, memoria_dados);
+    passo_atual++;
+
+    struct decode c = campos(instrucao_atual);
+    printf("\n[STEP] PC=%d | Opcode=%d\n", *PC, c.opcode);
+    execute(c, registradores, memoria_dados, PC, arit, mem);
+}
+
+void back(int registradores[], int memoria_dados[], int *PC) {
+    if (passo_atual > 0) {
+        passo_atual--;
+        
+        *PC = historico[passo_atual].PC;
+        for(int i = 0; i < 8; i++) registradores[i] = historico[passo_atual].registradores[i];
+        for(int i = 0; i < 256; i++) memoria_dados[i] = historico[passo_atual].memoria_dados[i];
+        
+        printf("\nBack executado, PC restaurado para %d\n", *PC);
+    } else {
+        printf("\nErro: vc esta no inicio do programa!\n");
+    }
+}
+
+void run(int memoria_instrucao[], int memoria_dados[], int registradores[], int *PC, int *arit, int *mem) {
+    printf("Inicio do back.\n");
+    while (*PC < 256 && fetch(memoria_instrucao, *PC) != 0) {
+        step(memoria_instrucao, memoria_dados, registradores, PC, arit, mem);
+    }
+    printf("Fim.\n");
 }
