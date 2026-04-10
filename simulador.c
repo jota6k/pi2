@@ -3,7 +3,7 @@
 #include "simulador.h"
 
 void leitura_arquivo_mem(int memoria[]) {
-    FILE *arquivo = fopen("memoria.mem", "r");
+    FILE *arquivo = fopen("memoria1.mem", "r");
     if(arquivo == NULL) {
         printf("Erro ao abrir o arquivo.\n");
         return;
@@ -17,17 +17,13 @@ void leitura_arquivo_mem(int memoria[]) {
     }
     fclose(arquivo);
 }
+
 void inicializar_registradores(int registradores[]) {
     for (int i = 0; i < 8; i++) {
         registradores[i] = 0;
     }
 }
-int ler_reg(int registradores[], int indice) {
-    return registradores[indice];
-}
-void escrever_reg(int registradores[], int indice, int valor) {
-    registradores[indice] = valor;
-}
+
 void leitura_arquivos_dados(int memoria_dados[]) {
     int i = 0;
     FILE *arquivo = fopen("dados.dat", "r");
@@ -43,14 +39,11 @@ void leitura_arquivos_dados(int memoria_dados[]) {
 
     fclose(arquivo);
 }
+
 int fetch(int memoria_instrucao[], int PC){
     return memoria_instrucao[PC];
 }
-struct decode{
-    int opcode;
-    int rs, rt, rd;
-    int funct, imm, addr;
-};
+
 struct decode campos(int instrucao){
     struct decode c;
 
@@ -67,6 +60,7 @@ struct decode campos(int instrucao){
     }
     return c;
 }
+
 void execute(struct decode c, int registradores[], int memoria_dados[], int *PC, int *aritmeticas, int *memoria_acesso){
     int flag_zero = 0;
     int endereco;
@@ -119,13 +113,14 @@ void execute(struct decode c, int registradores[], int memoria_dados[], int *PC,
                 printf("Erro de memoria (SW)\n");
             }
             break;
-        case 8:
-            int resultado = ULA(registradores[c.rs], registradores[c.rt], 2, &flag_zero);
+        case 8: {
+            ULA(registradores[c.rs], registradores[c.rt], 2, &flag_zero);
             if(flag_zero) {
                 *PC = *PC + c.imm + 1;
                 printf("BEQ verdadeiro -> salto para %d\n", *PC);
                 return;
             }
+        }
             printf("BEQ falso\n");
             break;
         case 2:
@@ -137,6 +132,7 @@ void execute(struct decode c, int registradores[], int memoria_dados[], int *PC,
     }
     (*PC)++;
 }
+
 void executar_programa(int memoria_instrucao[], int memoria_dados[], int registradores[]) {
     int PC = 0, total = 0, arit = 0, mem = 0;
 
@@ -150,6 +146,7 @@ void executar_programa(int memoria_instrucao[], int memoria_dados[], int registr
     printf("\n-Estatisticas-\n");
     printf("Total: %d | Arit: %d | Mem: %d\n", total, arit, mem);
 }
+
 int ULA(int A, int B, int controle, int *flag) {
     int resultado = 0;
     switch(controle) {
@@ -166,6 +163,7 @@ int ULA(int A, int B, int controle, int *flag) {
 
     return resultado;
 }
+
 void salvar_arquivo_dat(int memoria_dados[]) {
     FILE *arquivo = fopen("saidaDados.dat", "w");
     if(arquivo == NULL) {
@@ -177,12 +175,14 @@ void salvar_arquivo_dat(int memoria_dados[]) {
     }
     fclose(arquivo);
 }
+
 void imprimir_memoria(int memoria[]) {
     printf("\n- Conteudo da Memoria -\n");
     for(int i = 0; i < 256; i++) {
         printf("Mem[%d] = %d\n", i, memoria[i]);
     }
 }
+
 void salvar_asm(int memoria[]) {
 
     FILE *arquivo = fopen("programa.asm", "w");
