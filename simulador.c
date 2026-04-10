@@ -3,7 +3,7 @@
 #include "simulador.h"
 
 void leitura_arquivo_mem(int memoria[]) {
-    FILE *arquivo = fopen("memoria1.mem", "r");
+    FILE *arquivo = fopen("memoria.mem", "r");
     if(arquivo == NULL) {
         printf("Erro ao abrir o arquivo.\n");
         return;
@@ -88,10 +88,24 @@ void execute(struct decode c, int registradores[], int memoria_dados[], int *PC,
                     printf("FUNCT invalido!\n");
             }
             break;
+        case 2:
+            *PC = c.addr;
+            printf("JUMP para %d\n", c.addr);
+            return; 
         case 4:
             (*aritmeticas)++;
             registradores[c.rt] = registradores[c.rs] + c.imm;
             printf("ADDI r%d = r%d + %d\n", c.rt, c.rs, c.imm);
+            break;
+        case 8: {
+            ULA(registradores[c.rs], registradores[c.rt], 2, &flag_zero);
+            if(flag_zero) {
+                *PC = *PC + c.imm + 1;
+                printf("BEQ verdadeiro -> salto para %d\n", *PC);
+                return;
+            }
+        }
+            printf("BEQ falso\n");
             break;
         case 11:
             endereco = registradores[c.rs] + c.imm;
@@ -113,20 +127,6 @@ void execute(struct decode c, int registradores[], int memoria_dados[], int *PC,
                 printf("Erro de memoria (SW)\n");
             }
             break;
-        case 8: {
-            ULA(registradores[c.rs], registradores[c.rt], 2, &flag_zero);
-            if(flag_zero) {
-                *PC = *PC + c.imm + 1;
-                printf("BEQ verdadeiro -> salto para %d\n", *PC);
-                return;
-            }
-        }
-            printf("BEQ falso\n");
-            break;
-        case 2:
-            *PC = c.addr;
-            printf("JUMP para %d\n", c.addr);
-            return; 
         default:
             printf("Instrucao invalida!\n");
     }
