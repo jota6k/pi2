@@ -69,19 +69,19 @@ void execute(struct decode c, int registradores[], int memoria_dados[], int *PC,
             (*aritmeticas)++;
             switch(c.funct) {
                 case 0:
-                    registradores[c.rd] = registradores[c.rs] + registradores[c.rt];
+                    registradores[c.rd] = ULA(registradores[c.rs], registradores[c.rt], 0, &flag_zero);
                     printf("ADD r%d = r%d + r%d\n", c.rd, c.rs, c.rt);
                     break;
                 case 2:
-                    registradores[c.rd] = registradores[c.rs] - registradores[c.rt];
+                    registradores[c.rd] = ULA(registradores[c.rs], registradores[c.rt], 2, &flag_zero);
                     printf("SUB r%d = r%d - r%d\n", c.rd, c.rs, c.rt);
                     break;
                 case 4:
-                    registradores[c.rd] = registradores[c.rs] & registradores[c.rt];
+                    registradores[c.rd] = ULA(registradores[c.rs], registradores[c.rt], 4, &flag_zero);
                     printf("AND r%d = r%d & r%d\n", c.rd, c.rs, c.rt);
                     break;
                 case 5:
-                    registradores[c.rd] = registradores[c.rs] | registradores[c.rt];
+                    registradores[c.rd] = ULA(registradores[c.rs], registradores[c.rt], 5, &flag_zero);
                     printf("OR r%d = r%d | r%d\n", c.rd, c.rs, c.rt);
                     break;
                 default:
