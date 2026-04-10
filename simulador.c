@@ -133,20 +133,6 @@ void execute(struct decode c, int registradores[], int memoria_dados[], int *PC,
     (*PC)++;
 }
 
-void executar_programa(int memoria_instrucao[], int memoria_dados[], int registradores[]) {
-    int PC = 0, total = 0, arit = 0, mem = 0;
-
-    while (PC < 256) {
-        int instrucao_atual = fetch(memoria_instrucao, PC);
-        struct decode c = campos(instrucao_atual);
-        printf("\nPC=%d | opcode=%d\n", PC, c.opcode);
-        total++;
-        execute(c, registradores, memoria_dados, &PC, &arit, &mem);
-    }
-    printf("\n-Estatisticas-\n");
-    printf("Total: %d | Arit: %d | Mem: %d\n", total, arit, mem);
-}
-
 int ULA(int A, int B, int controle, int *flag) {
     int resultado = 0;
     switch(controle) {
@@ -282,9 +268,17 @@ void back(int registradores[], int memoria_dados[], int *PC) {
 }
 
 void run(int memoria_instrucao[], int memoria_dados[], int registradores[], int *PC, int *arit, int *mem) {
-    printf("Inicio do back.\n");
+    int total = 0;
+
+    printf("\n--- Executando ---\n");
+
     while (*PC < 256 && fetch(memoria_instrucao, *PC) != 0) {
         step(memoria_instrucao, memoria_dados, registradores, PC, arit, mem);
+        total++;
     }
-    printf("Fim.\n");
+
+    printf("\nTotal de Instrucoes: %d", total);
+    printf("\nAritmeticas: %d", *arit);
+    printf("\nMemoria: %d", *mem);
+    printf("\nPC Final: %d\n", *PC);
 }
