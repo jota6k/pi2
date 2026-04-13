@@ -16,9 +16,10 @@ struct EstadoMaquina {
     int registradores[8];
     int memoria_dados[256];
 };
-
-void leitura_arquivo_mem(int memoria[]);
-void leitura_arquivos_dados(int memoria_dados[]);
+void escolher_arquivo_mem(char nome_arquivo[]);
+void escolher_arquivo_dat(char nome_arquivo[]);
+void leitura_arquivo_mem(int memoria[], char nome_arquivo[]);
+void leitura_arquivos_dados(int memoria_dados[], char nome_arquivo[]);
 void inicializar_registradores(int registradores[]);
 int ler_reg(int registradores[], int indice);
 void escrever_reg(int registradores[], int indice, int valor);
