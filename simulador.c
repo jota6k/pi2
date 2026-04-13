@@ -101,19 +101,19 @@ void execute(struct decode c, int registradores[], int memoria_dados[], int *PC,
             switch(c.funct) {
                 case 0:
                     registradores[c.rd] = ULA(registradores[c.rs], registradores[c.rt], 0, &flag_zero);
-                    printf("ADD r%d = r%d + r%d\n", c.rd, c.rs, c.rt);
+                    printf("ADD $r%d = $r%d + $r%d\n", c.rd, c.rs, c.rt);
                     break;
                 case 2:
                     registradores[c.rd] = ULA(registradores[c.rs], registradores[c.rt], 2, &flag_zero);
-                    printf("SUB r%d = r%d - r%d\n", c.rd, c.rs, c.rt);
+                    printf("SUB $r%d = $r%d - $r%d\n", c.rd, c.rs, c.rt);
                     break;
                 case 4:
                     registradores[c.rd] = ULA(registradores[c.rs], registradores[c.rt], 4, &flag_zero);
-                    printf("AND r%d = r%d & r%d\n", c.rd, c.rs, c.rt);
+                    printf("AND $r%d = $r%d & $r%d\n", c.rd, c.rs, c.rt);
                     break;
                 case 5:
                     registradores[c.rd] = ULA(registradores[c.rs], registradores[c.rt], 5, &flag_zero);
-                    printf("OR r%d = r%d | r%d\n", c.rd, c.rs, c.rt);
+                    printf("OR $r%d = $r%d | $r%d\n", c.rd, c.rs, c.rt);
                     break;
                 default:
                     printf("FUNCT invalido!\n");
@@ -126,7 +126,7 @@ void execute(struct decode c, int registradores[], int memoria_dados[], int *PC,
         case 4:
             (*aritmeticas)++;
             registradores[c.rt] = registradores[c.rs] + c.imm;
-            printf("ADDI r%d = r%d + %d\n", c.rt, c.rs, c.imm);
+            printf("ADDI $r%d = $r%d + %d\n", c.rt, c.rs, c.imm);
             break;
         case 8: {
             ULA(registradores[c.rs], registradores[c.rt], 2, &flag_zero);
@@ -143,7 +143,7 @@ void execute(struct decode c, int registradores[], int memoria_dados[], int *PC,
             if (endereco >= 0 && endereco < 256) {
                 (*memoria_acesso)++;
                 registradores[c.rt] = memoria_dados[endereco];
-                printf("LW r%d = MEM[%d]\n", c.rt, endereco);
+                printf("LW $r%d = MEM[%d]\n", c.rt, endereco);
             } else {
                 printf("Erro de memoria (LW)\n");
             }
@@ -153,7 +153,7 @@ void execute(struct decode c, int registradores[], int memoria_dados[], int *PC,
             if (endereco >= 0 && endereco < 256) {
                 (*memoria_acesso)++;
                 memoria_dados[endereco] = registradores[c.rt];
-                printf("SW MEM[%d] = r%d\n", endereco, c.rt);
+                printf("SW MEM[%d] = $r%d\n", endereco, c.rt);
             } else {
                 printf("Erro de memoria (SW)\n");
             }
@@ -214,16 +214,16 @@ void imprimir_memoria_dados(int memoria[]) {
 }
 
 void salvar_asm(int memoria[]) {
+
     FILE *arquivo = fopen("programa.asm", "w");
 
     if (arquivo == NULL) {
         printf("Erro ao criar arquivo ASM\n");
         return;
     }
-    
     for(int PC = 0; PC < 256; PC++) {
-        int instrucao = memoria[PC];
 
+        int instrucao = memoria[PC];
         int opcode = (instrucao >> 12) & 0xF;
         int rs = (instrucao >> 9) & 0x7;
         int rt = (instrucao >> 6) & 0x7;
@@ -231,34 +231,33 @@ void salvar_asm(int memoria[]) {
         int funct = instrucao & 0x7;
         int imm = instrucao & 0x3F;
         int addr = instrucao & 0xFF;
-
         if (imm >= 32) imm -= 64;
         
-        switch(opcode) {
+    switch(opcode) {
             case 0:
                 switch(funct) {
-                    case 0: fprintf(arquivo, "add $%d, $%d, $%d\n", rd, rs, rt); break;
-                    case 2: fprintf(arquivo, "sub $%d, $%d, $%d\n", rd, rs, rt); break;
-                    case 4: fprintf(arquivo, "and $%d, $%d, $%d\n", rd, rs, rt); break;
-                    case 5: fprintf(arquivo, "or $%d, $%d, $%d\n", rd, rs, rt); break;
+                    case 0: fprintf(arquivo, "add $r%d, $r%d, $r%d\n", rd, rs, rt); break;
+                    case 2: fprintf(arquivo, "sub $r%d, $r%d, $r%d\n", rd, rs, rt); break;
+                    case 4: fprintf(arquivo, "and $r%d, $r%d, $r%d\n", rd, rs, rt); break;
+                    case 5: fprintf(arquivo, "or $r%d, $r%d, $r%d\n", rd, rs, rt); break;
                     default: fprintf(arquivo, "nop\n");
                 }
                 break;
 
             case 4:
-                fprintf(arquivo, "addi $%d, $%d, %d\n", rt, rs, imm);
+                fprintf(arquivo, "addi $r%d, $r%d, %d\n", rt, rs, imm);
                 break;
 
             case 11:
-                fprintf(arquivo, "lw $%d, %d($%d)\n", rt, imm, rs);
+                fprintf(arquivo, "lw $r%d, %d($r%d)\n", rt, imm, rs);
                 break;
 
             case 15:
-                fprintf(arquivo, "sw $%d, %d($%d)\n", rt, imm, rs);
+                fprintf(arquivo, "sw $r%d, %d($r%d)\n", rt, imm, rs);
                 break;
 
             case 8:
-                fprintf(arquivo, "beq $%d, $%d, %d\n", rs, rt, imm);
+                fprintf(arquivo, "beq $r%d, $r%d, %d\n", rs, rt, imm);
                 break;
 
             case 2:
@@ -269,9 +268,8 @@ void salvar_asm(int memoria[]) {
                 fprintf(arquivo, "nop\n");
         }
     }
-    
     fclose(arquivo);
-    printf("Arquivo asm salvo\n");
+    printf("Arquivo programa.asm salvo!\n");
 }
 
 struct EstadoMaquina historico[999]; 
@@ -295,7 +293,6 @@ void step(int memoria_instrucao[], int memoria_dados[], int registradores[], int
     passo_atual++;
 
     struct decode c = campos(instrucao_atual);
-    printf("\n===== STEP =====\n");
     printf("\n===== STEP ATUAL =====\n");
     printf("Instrucao atual (PC=%d): %d\n", *PC, instrucao_atual);
     printf("Opcode: %d\n", c.opcode);
