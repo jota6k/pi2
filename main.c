@@ -38,11 +38,8 @@ int main() {
 
         switch(op) {
             case 2:
-                printf("\nMemoria de Instrucoes");
-                imprimir_memoria(memoria_instrucao);
-
-                printf("\nMemoria de Dados");
-                imprimir_memoria(memoria_dados);
+                imprimir_memoria_instrucoes(memoria_instrucao);
+                imprimir_memoria_dados(memoria_dados);
                 break;
             case 3:
                 printf("\nBanco de Registradores\n");
