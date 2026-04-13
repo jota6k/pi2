@@ -193,8 +193,21 @@ void salvar_arquivo_dat(int memoria_dados[]) {
     fclose(arquivo);
 }
 
-void imprimir_memoria(int memoria[]) {
-    printf("\n- Conteudo da Memoria -\n");
+void imprimir_memoria_instrucoes(int memoria[]) {
+    printf("\n---Memoria de Instrucoes---\n");
+    for(int i = 0; i < 256; i++) {
+        printf("Mem[%d] = ", i); 
+        
+        for (int b = 15; b >= 0; b--) {
+            int bit = (memoria[i] >> b) & 1;
+            printf("%d", bit);
+        }
+        printf("\n");
+    }
+}
+
+void imprimir_memoria_dados(int memoria[]) {
+    printf("\n---Memoria de Dados---\n");
     for(int i = 0; i < 256; i++) {
         printf("Mem[%d] = %d\n", i, memoria[i]);
     }
