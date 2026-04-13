@@ -11,7 +11,7 @@ void escolher_arquivo_mem(char nome_arquivo[]){
 
         arquivo = fopen(nome_arquivo, "r");
         if (arquivo == NULL){
-            printf("Arquivo .mem não encontrado.\n");
+            printf("Arquivo .mem nao encontrado.\n");
         }
     } while (arquivo == NULL);
     printf("Arquivo .mem carregado...\n");
@@ -101,19 +101,19 @@ void execute(struct decode c, int registradores[], int memoria_dados[], int *PC,
             switch(c.funct) {
                 case 0:
                     registradores[c.rd] = ULA(registradores[c.rs], registradores[c.rt], 0, &flag_zero);
-                    printf("ADD $r%d = $r%d + $r%d\n", c.rd, c.rs, c.rt);
+                    printf("ADD $%d = $%d + $%d\n", c.rd, c.rs, c.rt);
                     break;
                 case 2:
                     registradores[c.rd] = ULA(registradores[c.rs], registradores[c.rt], 2, &flag_zero);
-                    printf("SUB $r%d = $r%d - $r%d\n", c.rd, c.rs, c.rt);
+                    printf("SUB $%d = $%d - $%d\n", c.rd, c.rs, c.rt);
                     break;
                 case 4:
                     registradores[c.rd] = ULA(registradores[c.rs], registradores[c.rt], 4, &flag_zero);
-                    printf("AND $r%d = $r%d & $r%d\n", c.rd, c.rs, c.rt);
+                    printf("AND $%d = $%d & $%d\n", c.rd, c.rs, c.rt);
                     break;
                 case 5:
                     registradores[c.rd] = ULA(registradores[c.rs], registradores[c.rt], 5, &flag_zero);
-                    printf("OR $r%d = $r%d | $r%d\n", c.rd, c.rs, c.rt);
+                    printf("OR $%d = $%d | $%d\n", c.rd, c.rs, c.rt);
                     break;
                 default:
                     printf("FUNCT invalido!\n");
@@ -126,7 +126,7 @@ void execute(struct decode c, int registradores[], int memoria_dados[], int *PC,
         case 4:
             (*aritmeticas)++;
             registradores[c.rt] = registradores[c.rs] + c.imm;
-            printf("ADDI $r%d = $r%d + %d\n", c.rt, c.rs, c.imm);
+            printf("ADDI $%d = $%d + %d\n", c.rt, c.rs, c.imm);
             break;
         case 8: {
             ULA(registradores[c.rs], registradores[c.rt], 2, &flag_zero);
@@ -143,7 +143,7 @@ void execute(struct decode c, int registradores[], int memoria_dados[], int *PC,
             if (endereco >= 0 && endereco < 256) {
                 (*memoria_acesso)++;
                 registradores[c.rt] = memoria_dados[endereco];
-                printf("LW $r%d = MEM[%d]\n", c.rt, endereco);
+                printf("LW $%d = MEM[%d]\n", c.rt, endereco);
             } else {
                 printf("Erro de memoria (LW)\n");
             }
@@ -153,7 +153,7 @@ void execute(struct decode c, int registradores[], int memoria_dados[], int *PC,
             if (endereco >= 0 && endereco < 256) {
                 (*memoria_acesso)++;
                 memoria_dados[endereco] = registradores[c.rt];
-                printf("SW MEM[%d] = $r%d\n", endereco, c.rt);
+                printf("SW MEM[%d] = $%d\n", endereco, c.rt);
             } else {
                 printf("Erro de memoria (SW)\n");
             }
@@ -236,28 +236,28 @@ void salvar_asm(int memoria[]) {
     switch(opcode) {
             case 0:
                 switch(funct) {
-                    case 0: fprintf(arquivo, "add $r%d, $r%d, $r%d\n", rd, rs, rt); break;
-                    case 2: fprintf(arquivo, "sub $r%d, $r%d, $r%d\n", rd, rs, rt); break;
-                    case 4: fprintf(arquivo, "and $r%d, $r%d, $r%d\n", rd, rs, rt); break;
-                    case 5: fprintf(arquivo, "or $r%d, $r%d, $r%d\n", rd, rs, rt); break;
+                    case 0: fprintf(arquivo, "add $%d, $%d, $%d\n", rd, rs, rt); break;
+                    case 2: fprintf(arquivo, "sub $%d, $%d, $%d\n", rd, rs, rt); break;
+                    case 4: fprintf(arquivo, "and $%d, $%d, $%d\n", rd, rs, rt); break;
+                    case 5: fprintf(arquivo, "or $%d, $%d, $%d\n", rd, rs, rt); break;
                     default: fprintf(arquivo, "nop\n");
                 }
                 break;
 
             case 4:
-                fprintf(arquivo, "addi $r%d, $r%d, %d\n", rt, rs, imm);
+                fprintf(arquivo, "addi $%d, $%d, %d\n", rt, rs, imm);
                 break;
 
             case 11:
-                fprintf(arquivo, "lw $r%d, %d($r%d)\n", rt, imm, rs);
+                fprintf(arquivo, "lw $%d, %d($%d)\n", rt, imm, rs);
                 break;
 
             case 15:
-                fprintf(arquivo, "sw $r%d, %d($r%d)\n", rt, imm, rs);
+                fprintf(arquivo, "sw $%d, %d($%d)\n", rt, imm, rs);
                 break;
 
             case 8:
-                fprintf(arquivo, "beq $r%d, $r%d, %d\n", rs, rt, imm);
+                fprintf(arquivo, "beq $%d, $%d, %d\n", rs, rt, imm);
                 break;
 
             case 2:
