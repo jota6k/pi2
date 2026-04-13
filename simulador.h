@@ -16,6 +16,8 @@ struct EstadoMaquina {
     int registradores[8];
     int memoria_dados[256];
 };
+void imprimir_memoria_instrucoes(int memoria[]);
+void imprimir_memoria_dados(int memoria[]);
 void escolher_arquivo_mem(char nome_arquivo[]);
 void escolher_arquivo_dat(char nome_arquivo[]);
 void leitura_arquivo_mem(int memoria[], char nome_arquivo[]);
