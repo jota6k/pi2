@@ -214,16 +214,16 @@ void imprimir_memoria_dados(int memoria[]) {
 }
 
 void salvar_asm(int memoria[]) {
-
     FILE *arquivo = fopen("programa.asm", "w");
 
     if (arquivo == NULL) {
         printf("Erro ao criar arquivo ASM\n");
         return;
     }
+    
     for(int PC = 0; PC < 256; PC++) {
-
         int instrucao = memoria[PC];
+
         int opcode = (instrucao >> 12) & 0xF;
         int rs = (instrucao >> 9) & 0x7;
         int rt = (instrucao >> 6) & 0x7;
@@ -231,45 +231,48 @@ void salvar_asm(int memoria[]) {
         int funct = instrucao & 0x7;
         int imm = instrucao & 0x3F;
         int addr = instrucao & 0xFF;
+        
+        // Extensão de sinal para o imediato
         if (imm >= 32) imm -= 64;
         
-    switch(opcode) {
+        switch(opcode) {
             case 0:
                 switch(funct) {
-                    case 0: fprintf(arquivo, "ADD R%d R%d R%d\n", rd, rs, rt); break;
-                    case 2: fprintf(arquivo, "SUB R%d R%d R%d\n", rd, rs, rt); break;
-                    case 4: fprintf(arquivo, "AND R%d R%d R%d\n", rd, rs, rt); break;
-                    case 5: fprintf(arquivo, "OR R%d R%d R%d\n", rd, rs, rt); break;
-                    default: fprintf(arquivo, "NOP\n");
+                    case 0: fprintf(arquivo, "add $%d, $%d, $%d\n", rd, rs, rt); break;
+                    case 2: fprintf(arquivo, "sub $%d, $%d, $%d\n", rd, rs, rt); break;
+                    case 4: fprintf(arquivo, "and $%d, $%d, $%d\n", rd, rs, rt); break;
+                    case 5: fprintf(arquivo, "or $%d, $%d, $%d\n", rd, rs, rt); break;
+                    default: fprintf(arquivo, "nop\n");
                 }
                 break;
 
             case 4:
-                fprintf(arquivo, "ADDI R%d R%d %d\n", rt, rs, imm);
+                fprintf(arquivo, "addi $%d, $%d, %d\n", rt, rs, imm);
                 break;
 
             case 11:
-                fprintf(arquivo, "LW R%d %d(R%d)\n", rt, imm, rs);
+                fprintf(arquivo, "lw $%d, %d($%d)\n", rt, imm, rs);
                 break;
 
             case 15:
-                fprintf(arquivo, "SW R%d %d(R%d)\n", rt, imm, rs);
+                fprintf(arquivo, "sw $%d, %d($%d)\n", rt, imm, rs);
                 break;
 
             case 8:
-                fprintf(arquivo, "BEQ R%d R%d %d\n", rs, rt, imm);
+                fprintf(arquivo, "beq $%d, $%d, %d\n", rs, rt, imm);
                 break;
 
             case 2:
-                fprintf(arquivo, "J %d\n", addr);
+                fprintf(arquivo, "j %d\n", addr);
                 break;
 
             default:
-                fprintf(arquivo, "NOP\n");
+                fprintf(arquivo, "nop\n");
         }
     }
+    
     fclose(arquivo);
-    printf("Arquivo programa.asm salvo!\n");
+    printf("Arquivo asm salvo\n");
 }
 
 struct EstadoMaquina historico[999]; 
