@@ -270,7 +270,7 @@ void salvar_estado(int PC_atual, int registradores[], int memoria_dados[]) {
 
 void step(int memoria_instrucao[], int memoria_dados[], int registradores[], int *PC, int *arit, int *mem) {
     int instrucao_atual = fetch(memoria_instrucao, *PC);
-    
+
     if (instrucao_atual == 0 || *PC >= 256) {
         printf("Nao ha mais instrucoes para executar.\n");
         return;
@@ -280,7 +280,10 @@ void step(int memoria_instrucao[], int memoria_dados[], int registradores[], int
     passo_atual++;
 
     struct decode c = campos(instrucao_atual);
-    printf("\n[STEP] PC=%d | Opcode=%d\n", *PC, c.opcode);
+    printf("\n===== STEP =====\n");
+    printf("\n===== STEP ATUAL =====\n");
+    printf("Instrucao atual (PC=%d): %d\n", *PC, instrucao_atual);
+    printf("Opcode: %d\n", c.opcode);
     execute(c, registradores, memoria_dados, PC, arit, mem);
 }
 
