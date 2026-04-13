@@ -6,40 +6,34 @@
 void escolher_arquivo_mem(char nome_arquivo[]){
     FILE *arquivo;
     do {
-        printf("Digite o nome do arquivo (.mem): ");
-        scanf("%49s", nome_arquivo);
+        printf("Digite o nome do arquivo .mem: ");
+        scanf("%s", nome_arquivo);
 
-        if (strstr(nome_arquivo, ".mem") == NULL){
-            printf("Erro: o arquivo deve ser .mem\n");
-            continue;
-        }
         arquivo = fopen(nome_arquivo, "r");
         if (arquivo == NULL){
-            printf("Erro: arquivo nao encontrado!\n");
+            printf("Arquivo .mem não encontrado.\n");
         }
     } while (arquivo == NULL);
-    printf("Arquivo .mem carregado com sucesso!\n");
+    printf("Arquivo .mem carregado...\n");
     fclose(arquivo);
 }
+
 void escolher_arquivo_dat(char nome_arquivo[]){
     FILE *arquivo;
     do {
-        printf("Digite o nome do arquivo (.dat): ");
-        scanf("%49s", nome_arquivo);
+        printf("Digite o nome do arquivo .dat: ");
+        scanf("%s", nome_arquivo);
 
-        if (strstr(nome_arquivo, ".dat") == NULL) {
-            printf("Erro: o arquivo deve ser .dat\n");
-            continue;
-        }
         arquivo = fopen(nome_arquivo, "r");
         if (arquivo == NULL) {
-            printf("Erro: arquivo nao encontrado!\n");
+            printf("Arquivo .dat nao encontrado\n");
         }
     } while (arquivo == NULL);
-    printf("Arquivo .dat carregado com sucesso!\n");
+    printf("Arquivo .dat carregado...\n");
     fclose(arquivo);
 }
-void leitura_arquivo_mem(int memoria[], char nome_arquivo[]){
+
+void leitura_arquivo_mem(int memoria[], char nome_arquivo[]) {
     FILE *arquivo = fopen(nome_arquivo, "r");
     if(arquivo == NULL) {
         printf("Erro ao abrir o arquivo.\n");
@@ -61,7 +55,7 @@ void inicializar_registradores(int registradores[]) {
     }
 }
 
-void leitura_arquivos_dados(int memoria_dados[], char *nome_arquivo) {
+void leitura_arquivos_dados(int memoria_dados[], char nome_arquivo[]) {
     int i = 0;
     FILE *arquivo = fopen(nome_arquivo, "r");
 
@@ -286,9 +280,7 @@ void step(int memoria_instrucao[], int memoria_dados[], int registradores[], int
     passo_atual++;
 
     struct decode c = campos(instrucao_atual);
-    printf("\n===== STEP ATUAL =====\n");
-    printf("Instrucao atual (PC=%d): %d\n", *PC, instrucao_atual);
-    printf("Opcode: %d\n", c.opcode);
+    printf("\n[STEP] PC=%d | Opcode=%d\n", *PC, c.opcode);
     execute(c, registradores, memoria_dados, PC, arit, mem);
 }
 
@@ -310,6 +302,11 @@ void run(int memoria_instrucao[], int memoria_dados[], int registradores[], int 
     printf("\n--- Executando ---\n");
 
     while (*PC < 256 && fetch(memoria_instrucao, *PC) != 0) {
+        if (passo_atual >= 998) {
+            printf("\nO programa esta em loop, forcando parada.");
+            break;
+        }
+
         step(memoria_instrucao, memoria_dados, registradores, PC, arit, mem);
         total++;
     }
