@@ -1,9 +1,46 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "simulador.h"
 
-void leitura_arquivo_mem(int memoria[]) {
-    FILE *arquivo = fopen("memoria.mem", "r");
+void escolher_arquivo_mem(char nome_arquivo[]){
+    FILE *arquivo;
+    do {
+        printf("Digite o nome do arquivo (.mem): ");
+        scanf("%49s", nome_arquivo);
+
+        if (strstr(nome_arquivo, ".mem") == NULL){
+            printf("Erro: o arquivo deve ser .mem\n");
+            continue;
+        }
+        arquivo = fopen(nome_arquivo, "r");
+        if (arquivo == NULL){
+            printf("Erro: arquivo nao encontrado!\n");
+        }
+    } while (arquivo == NULL);
+    printf("Arquivo .mem carregado com sucesso!\n");
+    fclose(arquivo);
+}
+void escolher_arquivo_dat(char nome_arquivo[]){
+    FILE *arquivo;
+    do {
+        printf("Digite o nome do arquivo (.dat): ");
+        scanf("%49s", nome_arquivo);
+
+        if (strstr(nome_arquivo, ".dat") == NULL) {
+            printf("Erro: o arquivo deve ser .dat\n");
+            continue;
+        }
+        arquivo = fopen(nome_arquivo, "r");
+        if (arquivo == NULL) {
+            printf("Erro: arquivo nao encontrado!\n");
+        }
+    } while (arquivo == NULL);
+    printf("Arquivo .dat carregado com sucesso!\n");
+    fclose(arquivo);
+}
+void leitura_arquivo_mem(int memoria[], char nome_arquivo[]){
+    FILE *arquivo = fopen(nome_arquivo, "r");
     if(arquivo == NULL) {
         printf("Erro ao abrir o arquivo.\n");
         return;
@@ -24,9 +61,9 @@ void inicializar_registradores(int registradores[]) {
     }
 }
 
-void leitura_arquivos_dados(int memoria_dados[]) {
+void leitura_arquivos_dados(int memoria_dados[], char *nome_arquivo) {
     int i = 0;
-    FILE *arquivo = fopen("dados.dat", "r");
+    FILE *arquivo = fopen(nome_arquivo, "r");
 
     if(arquivo == NULL){
         printf("Erro ao abrir arquivo.\n");
@@ -266,17 +303,14 @@ void back(int registradores[], int memoria_dados[], int *PC) {
         printf("\nErro: vc esta no inicio do programa!\n");
     }
 }
-
 void run(int memoria_instrucao[], int memoria_dados[], int registradores[], int *PC, int *arit, int *mem) {
     int total = 0;
-
     printf("\n--- Executando ---\n");
 
     while (*PC < 256 && fetch(memoria_instrucao, *PC) != 0) {
         step(memoria_instrucao, memoria_dados, registradores, PC, arit, mem);
         total++;
     }
-
     printf("\nTotal de Instrucoes: %d", total);
     printf("\nAritmeticas: %d", *arit);
     printf("\nMemoria: %d", *mem);
