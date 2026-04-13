@@ -286,7 +286,7 @@ void step(int memoria_instrucao[], int memoria_dados[], int registradores[], int
     passo_atual++;
 
     struct decode c = campos(instrucao_atual);
-    printf("\n===== STEP =====\n");
+    printf("\n===== STEP ATUAL =====\n");
     printf("Instrucao atual (PC=%d): %d\n", *PC, instrucao_atual);
     printf("Opcode: %d\n", c.opcode);
     execute(c, registradores, memoria_dados, PC, arit, mem);
