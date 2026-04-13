@@ -231,8 +231,7 @@ void salvar_asm(int memoria[]) {
         int funct = instrucao & 0x7;
         int imm = instrucao & 0x3F;
         int addr = instrucao & 0xFF;
-        
-        // Extensão de sinal para o imediato
+
         if (imm >= 32) imm -= 64;
         
         switch(opcode) {
