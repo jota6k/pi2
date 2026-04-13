@@ -12,28 +12,16 @@ int main() {
     int memoria_acesso = 0;
     int op;
     char nome_mem[50];
-    char nome_dados[50];
-
-    printf("Arquivo de instrucoes\n");
+    char nome_dat[50];
+    
+    printf("--- Inicializacao do Mini MIPS ---\n");
     escolher_arquivo_mem(nome_mem);
-    leitura_arquivo_mem(memoria_instrucao, nome_mem);
-    strcpy(nome_dados, nome_mem);
-    char *p = strstr(nome_dados, ".mem");
-    if (p != NULL) {
-        *p = '\0';
-    }
-    strcat(nome_dados, ".dat");
-    FILE *teste = fopen(nome_dados, "r");
+    escolher_arquivo_dat(nome_dat);
 
-    if (teste != NULL) {
-        printf("Arquivo .dat encontrado: %s\n", nome_dados);
-        fclose(teste);
-    } else {
-        printf("Arquivo .dat nao encontrado.\n");
-        escolher_arquivo_dat(nome_dados);
-    }
-    leitura_arquivos_dados(memoria_dados, nome_dados);
     inicializar_registradores(registradores);
+    
+    leitura_arquivo_mem(memoria_instrucao, nome_mem);
+    leitura_arquivos_dados(memoria_dados, nome_dat);
 
     do {
         printf("\n--- Menu do Simulador Mini MIPS ---\n");
