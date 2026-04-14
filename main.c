@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include "simulador.h"
 
 int main() {
@@ -15,13 +14,34 @@ int main() {
     char nome_dat[50];
     
     printf("--- Inicializacao do Mini MIPS ---\n");
-    escolher_arquivo_mem(nome_mem);
-    escolher_arquivo_dat(nome_dat);
+
+    int status_mem = escolher_arquivo_mem(nome_mem);
+    if (status_mem == -1) {
+        printf("Encerrando o programa.\n");
+        return 0;
+    }
+
+    int status_dat = escolher_arquivo_dat(nome_dat);
+    if (status_dat == -1) {
+        printf("Encerrando o programa.\n");
+        return 0;
+    }
 
     inicializar_registradores(registradores);
-    
-    leitura_arquivo_mem(memoria_instrucao, nome_mem);
-    leitura_arquivos_dados(memoria_dados, nome_dat);
+
+    if (status_mem == 1) {
+        leitura_arquivo_mem(memoria_instrucao, nome_mem);
+        printf("Memoria de instrucoes carregada com sucesso.\n");
+    } else {
+        printf("Memoria de instrucoes iniciada com zeros.\n");
+    }
+
+    if (status_dat == 1) {
+        leitura_arquivos_dados(memoria_dados, nome_dat);
+        printf("Memoria de dados carregada com sucesso.\n");
+    } else {
+        printf("Memoria de dados iniciada com zeros.\n");
+    }
 
     do {
         printf("\n--- Menu do Simulador Mini MIPS ---\n");
@@ -34,7 +54,11 @@ int main() {
         printf("10 - Voltar uma instrucao (Back)\n");
         printf("0 - Sair\n");
         printf("Escolha: ");
-        scanf("%d", &op);
+        
+        if (scanf("%d", &op) != 1) {
+            while (getchar() != '\n'); 
+            op = -1; 
+        }
 
         switch(op) {
             case 2:
