@@ -3,78 +3,30 @@
 #include <string.h>
 #include "simulador.h"
 
-int escolher_arquivo_mem(char nome_arquivo[]){
-    int opcao;
+void escolher_arquivo_mem(char nome_arquivo[]){
     FILE *arquivo;
 
-    do {
-        printf("\n--- Carregar memoria de instrucoes (.mem) ---\n");
-        printf("1 - Digitar o nome do arquivo\n");
-        printf("2 - Iniciar com memoria zerada\n");
-        printf("0 - Encerrar o programa\n");
-        printf("Escolha: ");
-        
-        if (scanf("%d", &opcao) != 1) {
-            while (getchar() != '\n');
-            continue;
-        }
+    printf("\nDigite o nome do arquivo .mem: ");
+    scanf("%s", nome_arquivo);
 
-        if (opcao == 0) {
-            return -1;
-        } else if (opcao == 2) {
-            return 0;
-        } else if (opcao == 1) {
-            printf("Digite o nome do arquivo .mem: ");
-            scanf("%s", nome_arquivo);
-            arquivo = fopen(nome_arquivo, "r");
-            
-            if(arquivo == NULL) {
-                printf("O arquivo nao foi encontrado, tente novamente.\n");
-            } else {
-                fclose(arquivo);
-                return 1;
-            }
-        } else {
-            printf("Opcao invalida.\n");
-        }
-    } while (1);
+    if (arquivo == NULL) {
+        printf("Erro: o arquivo %s nao foi encontrado.\n", nome_arquivo);
+    }
+
+    fclose(arquivo);
 }
 
-int escolher_arquivo_dat(char nome_arquivo[]){
-    int opcao;
+void escolher_arquivo_dat(char nome_arquivo[]){
     FILE *arquivo;
 
-    do {
-        printf("\n--- Carregar memoria de dados (.dat) ---\n");
-        printf("1 - Digitar o nome do arquivo\n");
-        printf("2 - Iniciar com memoria zerada\n");
-        printf("0 - Encerrar o programa\n");
-        printf("Escolha: ");
-        
-        if (scanf("%d", &opcao) != 1) {
-            while (getchar() != '\n');
-            continue;
-        }
+    printf("\nDigite o nome do arquivo .dat: ");
+    scanf("%s", nome_arquivo);
 
-        if (opcao == 0) {
-            return -1;
-        } else if (opcao == 2) {
-            return 0;
-        } else if (opcao == 1) {
-            printf("Digite o nome do arquivo .dat: ");
-            scanf("%s", nome_arquivo);
-            arquivo = fopen(nome_arquivo, "r");
-            
-            if (arquivo == NULL) {
-                printf("O arquivo nao foi encontrado, tente novamente.\n");
-            } else {
-                fclose(arquivo);
-                return 1;
-            }
-        } else {
-            printf("Opcao invalida.\n");
-        }
-    } while (1);
+    if (arquivo = NULL) {
+        printf("Erro: o arquivo %s nao foi encontrado.\n", nome_arquivo);
+    }
+
+    fclose(arquivo);
 }
 
 void leitura_arquivo_mem(int memoria[], char nome_arquivo[]) {
@@ -250,7 +202,7 @@ int ULA(int A, int B, int controle, int *flag) {
 void imprimir_memoria_instrucoes(int memoria[]) {
     printf("\n--- Memoria de Instrucoes (Binario) ---\n");
     for(int i = 0; i < 256; i++) {
-        printf("Mem[%3d] = ", i); 
+        printf("Mem[%d] = ", i); 
         for (int b = 15; b >= 0; b--) {
             int bit = (memoria[i] >> b) & 1;
             printf("%d", bit);
@@ -262,7 +214,7 @@ void imprimir_memoria_instrucoes(int memoria[]) {
 void imprimir_memoria_dados(int memoria[]) {
     printf("\n--- Memoria de Dados (Decimal) ---\n");
     for(int i = 0; i < 256; i++) {
-        printf("Mem[%3d] = %d\n", i, memoria[i]);
+        printf("Mem[%d] = %d\n", i, memoria[i]);
     }
 }
 
@@ -279,6 +231,14 @@ void salvar_arquivo_dat(int memoria_dados[]) {
     }
     
     fclose(arquivo);
+}
+
+void imprimir_registradores(int registradores[], int PC) {
+    printf("\nBanco de Registradores\n");
+    for (int i = 0; i < 8; i++) {
+        printf("$%d = %d\n", i, registradores[i]);
+    }
+    printf("PC = %d\n", PC);
 }
 
 void salvar_asm(int memoria[]) {
