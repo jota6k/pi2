@@ -12,42 +12,16 @@ int main() {
     int op;
     char nome_mem[50];
     char nome_dat[50];
-    
-    printf("--- Inicializacao do Mini MIPS ---\n");
-
-    int status_mem = escolher_arquivo_mem(nome_mem);
-    if (status_mem == -1) {
-        printf("Encerrando o programa.\n");
-        return 0;
-    }
-
-    int status_dat = escolher_arquivo_dat(nome_dat);
-    if (status_dat == -1) {
-        printf("Encerrando o programa.\n");
-        return 0;
-    }
 
     inicializar_registradores(registradores);
-
-    if (status_mem == 1) {
-        leitura_arquivo_mem(memoria_instrucao, nome_mem);
-        printf("Memoria de instrucoes carregada com sucesso.\n");
-    } else {
-        printf("Memoria de instrucoes iniciada com zeros.\n");
-    }
-
-    if (status_dat == 1) {
-        leitura_arquivos_dados(memoria_dados, nome_dat);
-        printf("Memoria de dados carregada com sucesso.\n");
-    } else {
-        printf("Memoria de dados iniciada com zeros.\n");
-    }
-
+    
     do {
         printf("\n--- Menu do Simulador Mini MIPS ---\n");
-        printf("2 - Mostrar memorias\n");
-        printf("3 - Mostrar registradores\n");
-        printf("6 - Salvar .asm\n");
+        printf("1 - Carregar memoria de instrucoes (.mem)\n");
+        printf("2 - Carregar memoria de dados (.dat)\n");
+        printf("3 - Imprimir memorias (instrucoes e dados)\n");
+        printf("4 - Imprimir banco de registradores\n");
+        printf("5 - Imprimir todo o simulador (registradores e memorias)\n");
         printf("7 - Salvar saidaDados.dat\n");
         printf("8 - Executar programa (Run)\n");
         printf("9 - Executar uma instrucao (Step)\n");
@@ -61,17 +35,22 @@ int main() {
         }
 
         switch(op) {
+            case 1:
+                escolher_arquivo_mem(nome_mem);
+                break;
             case 2:
+                escolher_arquivo_dat(nome_dat);
+                break;
+            case 3:
                 imprimir_memoria_instrucoes(memoria_instrucao);
                 imprimir_memoria_dados(memoria_dados);
                 break;
-            case 3:
-                printf("\nBanco de Registradores\n");
-                for (int i = 0; i < 8; i++) {
-                    printf("R%d = %d\n", i, registradores[i]);
-                }
-                printf("PC = %d\n", PC);
-                break;
+            case 4:
+                imprimir_registradores(registradores, PC);
+            case 5:
+                imprimir_registradores(registradores, PC);
+                imprimir_memoria_instrucoes(memoria_instrucao);
+                imprimir_memoria_dados(memoria_dados);
             case 6:
                 salvar_asm(memoria_instrucao);
                 break;
