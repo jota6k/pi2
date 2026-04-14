@@ -17,8 +17,8 @@ struct EstadoMaquina {
     int memoria_dados[256];
 };
 
-int escolher_arquivo_mem(char nome_arquivo[]);
-int escolher_arquivo_dat(char nome_arquivo[]);
+void escolher_arquivo_mem(char nome_arquivo[]);
+void escolher_arquivo_dat(char nome_arquivo[]);
 void leitura_arquivo_mem(int memoria[], char nome_arquivo[]);
 void leitura_arquivos_dados(int memoria_dados[], char nome_arquivo[]);
 void inicializar_registradores(int registradores[]);
@@ -32,6 +32,7 @@ void imprimir_memoria_instrucoes(int memoria[]);
 void imprimir_memoria_dados(int memoria[]);
 void salvar_arquivo_dat(int memoria_dados[]);
 void salvar_asm(int memoria[]);
+void imprimir_registradores(int registradores[], int PC);
 
 void step(int memoria_instrucao[], int memoria_dados[], int registradores[], int *PC, int *arit, int *mem);
 void back(int registradores[], int memoria_dados[], int *PC);
