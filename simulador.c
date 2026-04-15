@@ -307,62 +307,52 @@ void salvar_asm(int memoria[]) {
         return;
     }
     
-    for(int PC = 0; PC < 256; PC++) {
+    for(int PC = 0; PC < 256; PC++){
         int instrucao = memoria[PC];
-        int opcode = (instrucao >> 12) & 0xF;
-        int rs = (instrucao >> 9) & 0x7;
-        int rt = (instrucao >> 6) & 0x7;
-        int rd = (instrucao >> 3) & 0x7;
-        int funct = instrucao & 0x7;
-        int imm = instrucao & 0x3F;
-        int addr = instrucao & 0xFF;
+        struct decode c = campos(instrucao);
         
-        if (imm >= 32) {
-            imm -= 64;
-        }
-        
-        switch(opcode) {
+        switch(c.opcode) {
             case 0:
-                switch(funct) {
+                switch(c.funct) {
                     case 0: 
-                        fprintf(arquivo, "add r%d, r%d, r%d\n", rd, rs, rt); 
+                        fprintf(arquivo, "add r%d, r%d, r%d\n", c.rd, c.rs, c.rt); 
                         break;
                     case 2: 
-                        fprintf(arquivo, "sub r%d, r%d, r%d\n", rd, rs, rt); 
+                        fprintf(arquivo, "sub r%d, r%d, r%d\n", c.rd, c.rs, c.rt); 
                         break;
                     case 4: 
-                        fprintf(arquivo, "and r%d, r%d, r%d\n", rd, rs, rt); 
+                        fprintf(arquivo, "and r%d, r%d, r%d\n", c.rd, c.rs, c.rt); 
                         break;
                     case 5: 
-                        fprintf(arquivo, "or r%d, r%d, r%d\n", rd, rs, rt); 
+                        fprintf(arquivo, "or r%d, r%d, r%d\n", c.rd, c.rs, c.rt); 
                         break;
                     default: 
-                        fprintf(arquivo, "NOP\n");
+                        fprintf(arquivo, "Instrucao invalida\n");
                 }
                 break;
                 
             case 4: 
-                fprintf(arquivo, "addi r%d, r%d, %d\n", rt, rs, imm); 
+                fprintf(arquivo, "addi r%d, r%d, %d\n", c.rt, c.rs, c.imm); 
                 break;
                 
             case 11: 
-                fprintf(arquivo, "lw r%d, %d(%d)\n", rt, imm, rs); 
+                fprintf(arquivo, "lw r%d, %d(%d)\n", c.rt, c.imm, c.rs); 
                 break;
                 
             case 15: 
-                fprintf(arquivo, "sw r%d, %d(%d)\n", rt, imm, rs); 
+                fprintf(arquivo, "sw r%d, %d(%d)\n", c.rt, c.imm, c.rs); 
                 break;
                 
             case 8: 
-                fprintf(arquivo, "beq r%d, r%d, %d\n", rs, rt, imm); 
+                fprintf(arquivo, "beq r%d, r%d, %d\n", c.rs, c.rt, c.imm); 
                 break;
                 
             case 2: 
-                fprintf(arquivo, "j %d\n", addr); 
+                fprintf(arquivo, "j %d\n", c.addr); 
                 break;
                 
             default: 
-                fprintf(arquivo, "nop\n");
+                fprintf(arquivo, "Instrucao invalida\n");
         }
     }
     
