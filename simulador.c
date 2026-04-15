@@ -8,7 +8,8 @@ void escolher_arquivo_mem(char nome_arquivo[]){
 
     printf("\nDigite o nome do arquivo .mem: ");
     scanf("%s", nome_arquivo);
-
+    arquivo = fopen(nome_arquivo, "r");
+    printf("Arquivo carregado.\n");
     if (arquivo == NULL) {
         printf("Erro: o arquivo %s nao foi encontrado.\n", nome_arquivo);
     }
@@ -21,8 +22,9 @@ void escolher_arquivo_dat(char nome_arquivo[]){
 
     printf("\nDigite o nome do arquivo .dat: ");
     scanf("%s", nome_arquivo);
-
-    if (arquivo = NULL) {
+    arquivo = fopen(nome_arquivo, "r");
+    printf("Arquivo carregado.\n");
+    if (arquivo == NULL) {
         printf("Erro: o arquivo %s nao foi encontrado.\n", nome_arquivo);
     }
 
@@ -95,55 +97,48 @@ struct decode campos(int instrucao){
 void execute(struct decode c, int registradores[], int memoria_dados[], int *PC, int *aritmeticas, int *memoria_acesso){
     int flag_zero = 0;
     int endereco;
-    
+    int ctrl = controle_ULA(c.opcode, c.funct);
+
     switch(c.opcode) {
-        case 0:
+        case 0: // R-type
             (*aritmeticas)++;
+
+            if (ctrl == -1) {
+                printf("Operacao invalida!\n");
+                break;
+            }
+            registradores[c.rd] = ULA(registradores[c.rs], registradores[c.rt], ctrl, &flag_zero);
+
             switch(c.funct) {
-                case 0:
-                    registradores[c.rd] = ULA(registradores[c.rs], registradores[c.rt], 0, &flag_zero);
-                    printf("ADD r%d = r%d + r%d\n", c.rd, c.rs, c.rt);
-                    break;
-                case 2:
-                    registradores[c.rd] = ULA(registradores[c.rs], registradores[c.rt], 2, &flag_zero);
-                    printf("SUB r%d = r%d - r%d\n", c.rd, c.rs, c.rt);
-                    break;
-                case 4:
-                    registradores[c.rd] = ULA(registradores[c.rs], registradores[c.rt], 4, &flag_zero);
-                    printf("AND r%d = r%d & r%d\n", c.rd, c.rs, c.rt);
-                    break;
-                case 5:
-                    registradores[c.rd] = ULA(registradores[c.rs], registradores[c.rt], 5, &flag_zero);
-                    printf("OR r%d = r%d | r%d\n", c.rd, c.rs, c.rt);
-                    break;
-                default: 
-                    printf("FUNCT invalido!\n");
+                case 0: printf("ADD r%d = r%d + r%d\n", c.rd, c.rs, c.rt); break;
+                case 2: printf("SUB r%d = r%d - r%d\n", c.rd, c.rs, c.rt); break;
+                case 4: printf("AND r%d = r%d & r%d\n", c.rd, c.rs, c.rt); break;
+                case 5: printf("OR r%d = r%d | r%d\n", c.rd, c.rs, c.rt); break;
             }
             break;
-            
-        case 2:
+        case 2: // JUMP
             *PC = c.addr;
             printf("JUMP para %d\n", c.addr);
-            return; 
-            
-        case 4:
+            return;
+        case 4: // ADDI
             (*aritmeticas)++;
-            registradores[c.rt] = registradores[c.rs] + c.imm;
+            registradores[c.rt] = ULA(registradores[c.rs], c.imm, ctrl, &flag_zero);
             printf("ADDI r%d = r%d + %d\n", c.rt, c.rs, c.imm);
             break;
-            
-        case 8:
-            ULA(registradores[c.rs], registradores[c.rt], 2, &flag_zero);
+        case 8: // BEQ
+            ULA(registradores[c.rs], registradores[c.rt], ctrl, &flag_zero);
+
             if(flag_zero) {
-                *PC = *PC + c.imm + 1;
+                *PC = (*PC + 1) + c.imm;
                 printf("BEQ verdadeiro -> salto para %d\n", *PC);
                 return;
             }
+
             printf("BEQ falso\n");
             break;
-            
-        case 11:
-            endereco = registradores[c.rs] + c.imm;
+        case 11: // LW
+            endereco = ULA(registradores[c.rs], c.imm, ctrl, &flag_zero);
+
             if (endereco >= 0 && endereco < 256) {
                 (*memoria_acesso)++;
                 registradores[c.rt] = memoria_dados[endereco];
@@ -152,9 +147,9 @@ void execute(struct decode c, int registradores[], int memoria_dados[], int *PC,
                 printf("Erro de memoria (LW)\n");
             }
             break;
-            
-        case 15:
-            endereco = registradores[c.rs] + c.imm;
+        case 15: // SW
+            endereco = ULA(registradores[c.rs], c.imm, ctrl, &flag_zero);
+
             if (endereco >= 0 && endereco < 256) {
                 (*memoria_acesso)++;
                 memoria_dados[endereco] = registradores[c.rt];
@@ -163,13 +158,32 @@ void execute(struct decode c, int registradores[], int memoria_dados[], int *PC,
                 printf("Erro de memoria (SW)\n");
             }
             break;
-            
-        default: 
+
+        default:
             printf("Instrucao invalida!\n");
     }
     (*PC)++;
 }
-
+int controle_ULA(int opcode, int funct) {
+    switch(opcode) {
+    case 0: // tipo R
+        switch(funct) {
+            case 0: return 0; // ADD
+            case 2: return 2; // SUB
+            case 4: return 4; // AND
+            case 5: return 5; // OR
+            default: return -1;
+            }
+    case 11: // LW
+    case 15: // SW
+    case 4:  // ADDI
+        return 0;
+    case 8: // BEQ
+        return 2; // sub para fazer a comparação
+    default:
+        return -1;
+    }
+}
 int ULA(int A, int B, int controle, int *flag) {
     int resultado = 0;
     
@@ -202,15 +216,59 @@ int ULA(int A, int B, int controle, int *flag) {
 void imprimir_memoria_instrucoes(int memoria[]) {
     printf("\n--- Memoria de Instrucoes (Binario) ---\n");
     for(int i = 0; i < 256; i++) {
+        int instrucao = memoria[i];
         printf("Mem[%d] = ", i); 
         for (int b = 15; b >= 0; b--) {
             int bit = (memoria[i] >> b) & 1;
             printf("%d", bit);
         }
+        struct decode c = campos(instrucao);
+
+printf("  |  ");
+    switch(c.opcode) {
+        case 0:
+    switch(c.funct) {
+        case 0:
+            printf("ADD r%d = r%d + r%d", c.rd, c.rs, c.rt);
+            break;
+        case 2:
+            printf("SUB r%d = r%d - r%d", c.rd, c.rs, c.rt);
+            break;
+        case 4:
+            printf("AND r%d = r%d & r%d", c.rd, c.rs, c.rt);
+            break;
+        case 5:
+            printf("OR r%d = r%d | r%d", c.rd, c.rs, c.rt);
+            break;
+        default:
+            printf("Tipo R invalido");
+}
+            break;
+        case 4:
+            printf("ADDI r%d = r%d + %d", c.rt, c.rs, c.imm);
+            break;
+
+        case 11:
+            printf("LW r%d = MEM[%d]", c.rt, c.rs + c.imm);
+            break;
+
+        case 15:
+            printf("SW MEM[%d] = r%d", c.rs + c.imm, c.rt);
+            break;
+
+        case 8:
+            printf("BEQ r%d == r%d (salto %d)", c.rs, c.rt, c.imm);
+            break;
+
+        case 2:
+            printf("JUMP %d", c.addr);
+            break;
+        default:
+                printf("Instrucao invalida");
+        }
         printf("\n");
     }
 }
-
 void imprimir_memoria_dados(int memoria[]) {
     printf("\n--- Memoria de Dados (Decimal) ---\n");
     for(int i = 0; i < 256; i++) {
@@ -267,16 +325,16 @@ void salvar_asm(int memoria[]) {
             case 0:
                 switch(funct) {
                     case 0: 
-                        fprintf(arquivo, "ADD R%d R%d R%d\n", rd, rs, rt); 
+                        fprintf(arquivo, "add r%d, r%d, r%d\n", rd, rs, rt); 
                         break;
                     case 2: 
-                        fprintf(arquivo, "SUB R%d R%d R%d\n", rd, rs, rt); 
+                        fprintf(arquivo, "sub r%d, r%d, r%d\n", rd, rs, rt); 
                         break;
                     case 4: 
-                        fprintf(arquivo, "AND R%d R%d R%d\n", rd, rs, rt); 
+                        fprintf(arquivo, "and r%d, r%d, r%d\n", rd, rs, rt); 
                         break;
                     case 5: 
-                        fprintf(arquivo, "OR R%d R%d R%d\n", rd, rs, rt); 
+                        fprintf(arquivo, "or r%d, r%d, r%d\n", rd, rs, rt); 
                         break;
                     default: 
                         fprintf(arquivo, "NOP\n");
@@ -284,27 +342,27 @@ void salvar_asm(int memoria[]) {
                 break;
                 
             case 4: 
-                fprintf(arquivo, "ADDI R%d R%d %d\n", rt, rs, imm); 
+                fprintf(arquivo, "addi r%d, r%d, %d\n", rt, rs, imm); 
                 break;
                 
             case 11: 
-                fprintf(arquivo, "LW R%d %d(R%d)\n", rt, imm, rs); 
+                fprintf(arquivo, "lw r%d, %d(%d)\n", rt, imm, rs); 
                 break;
                 
             case 15: 
-                fprintf(arquivo, "SW R%d %d(R%d)\n", rt, imm, rs); 
+                fprintf(arquivo, "sw r%d, %d(%d)\n", rt, imm, rs); 
                 break;
                 
             case 8: 
-                fprintf(arquivo, "BEQ R%d R%d %d\n", rs, rt, imm); 
+                fprintf(arquivo, "beq r%d, r%d, %d\n", rs, rt, imm); 
                 break;
                 
             case 2: 
-                fprintf(arquivo, "J %d\n", addr); 
+                fprintf(arquivo, "j %d\n", addr); 
                 break;
                 
             default: 
-                fprintf(arquivo, "NOP\n");
+                fprintf(arquivo, "nop\n");
         }
     }
     
@@ -376,12 +434,10 @@ void run(int memoria_instrucao[], int memoria_dados[], int registradores[], int 
         if (passo_atual >= 998) {
             printf("\nO programa esta em loop, forcando parada.");
             break;
-        }
-        
+        }        
         step(memoria_instrucao, memoria_dados, registradores, PC, arit, mem);
         total++;
-    }
-    
+    }    
     printf("\nTotal de Instrucoes: %d", total);
     printf("\nAritmeticas: %d", *arit);
     printf("\nMemoria: %d", *mem);
