@@ -27,7 +27,7 @@ int fetch(int memoria_instrucao[], int PC);
 struct decode campos(int instrucao);
 void execute(struct decode c, int registradores[], int memoria_dados[], int *PC, int *aritmeticas, int *memoria_acesso);
 int ULA(int A, int B, int controle, int *flag);
-
+int controle_ULA(int opcode, int funct);
 void imprimir_memoria_instrucoes(int memoria[]);
 void imprimir_memoria_dados(int memoria[]);
 void salvar_arquivo_dat(int memoria_dados[]);
