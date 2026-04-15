@@ -22,6 +22,7 @@ int main() {
         printf("3 - Imprimir memorias (instrucoes e dados)\n");
         printf("4 - Imprimir banco de registradores\n");
         printf("5 - Imprimir todo o simulador (registradores e memorias)\n");
+        printf("6 - Salvar programa em ASM\n");
         printf("7 - Salvar saidaDados.dat\n");
         printf("8 - Executar programa (Run)\n");
         printf("9 - Executar uma instrucao (Step)\n");
@@ -37,9 +38,11 @@ int main() {
         switch(op) {
             case 1:
                 escolher_arquivo_mem(nome_mem);
+                leitura_arquivo_mem(memoria_instrucao, nome_mem);
                 break;
             case 2:
                 escolher_arquivo_dat(nome_dat);
+                leitura_arquivos_dados(memoria_dados, nome_dat);
                 break;
             case 3:
                 imprimir_memoria_instrucoes(memoria_instrucao);
@@ -47,10 +50,12 @@ int main() {
                 break;
             case 4:
                 imprimir_registradores(registradores, PC);
+                break;
             case 5:
                 imprimir_registradores(registradores, PC);
                 imprimir_memoria_instrucoes(memoria_instrucao);
                 imprimir_memoria_dados(memoria_dados);
+                break;
             case 6:
                 salvar_asm(memoria_instrucao);
                 break;
