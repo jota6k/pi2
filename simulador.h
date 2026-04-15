@@ -34,8 +34,9 @@ void salvar_arquivo_dat(int memoria_dados[]);
 void salvar_asm(int memoria[]);
 void imprimir_registradores(int registradores[], int PC);
 
-void step(int memoria_instrucao[], int memoria_dados[], int registradores[], int *PC, int *arit, int *mem);
-void back(int registradores[], int memoria_dados[], int *PC);
-void run(int memoria_instrucao[], int memoria_dados[], int registradores[], int *PC, int *arit, int *mem);
+void salvar_estado(int PC_atual, int registradores[], int memoria_dados[], struct EstadoMaquina historico[], int *passo_atual);
+void step(int memoria_instrucao[], int memoria_dados[], int registradores[], int *PC, int *arit, int *mem, struct EstadoMaquina historico[], int *passo_atual);
+void back(int registradores[], int memoria_dados[], int *PC, struct EstadoMaquina historico[], int *passo_atual);
+void run(int memoria_instrucao[], int memoria_dados[], int registradores[], int *PC, int *arit, int *mem, struct EstadoMaquina historico[], int *passo_atual);
 
 #endif
