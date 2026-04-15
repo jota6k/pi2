@@ -12,6 +12,8 @@ int main() {
     int op;
     char nome_mem[50];
     char nome_dat[50];
+    struct EstadoMaquina historico[999];
+    int passo_atual = 0;
 
     inicializar_registradores(registradores);
     
@@ -64,13 +66,13 @@ int main() {
                 printf("Arquivo saidaDados.dat salvo\n");
                 break;
             case 8:
-                run(memoria_instrucao, memoria_dados, registradores, &PC, &aritmeticas, &memoria_acesso);
+                run(memoria_instrucao, memoria_dados, registradores, &PC, &aritmeticas, &memoria_acesso, historico, &passo_atual);
                 break;
             case 9:
-                step(memoria_instrucao, memoria_dados, registradores, &PC, &aritmeticas, &memoria_acesso);
+                step(memoria_instrucao, memoria_dados, registradores, &PC, &aritmeticas, &memoria_acesso, historico, &passo_atual);
                 break;
             case 10:
-                back(registradores, memoria_dados, &PC);
+                back(registradores, memoria_dados, &PC, historico, &passo_atual);
                 break;
             case 0:
                 printf("Programa encerrado\n");
