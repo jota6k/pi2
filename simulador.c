@@ -50,12 +50,6 @@ void leitura_arquivo_mem(int memoria[], char nome_arquivo[]) {
     fclose(arquivo);
 }
 
-void inicializar_registradores(int registradores[]) {
-    for (int i = 0; i < 8; i++) {
-        registradores[i] = 0;
-    }
-}
-
 void leitura_arquivos_dados(int memoria_dados[], char nome_arquivo[]) {
     int i = 0;
     FILE *arquivo = fopen(nome_arquivo, "r");
@@ -70,6 +64,12 @@ void leitura_arquivos_dados(int memoria_dados[], char nome_arquivo[]) {
     }
     
     fclose(arquivo);
+}
+
+void inicializar_registradores(int registradores[]) {
+    for (int i = 0; i < 8; i++) {
+        registradores[i] = 0;
+    }
 }
 
 int fetch(int memoria_instrucao[], int PC){
@@ -110,52 +110,57 @@ void execute(struct decode c, int registradores[], int memoria_dados[], int *PC,
             registradores[c.rd] = ULA(registradores[c.rs], registradores[c.rt], ctrl, &flag_zero);
 
             switch(c.funct) {
-                case 0: printf("ADD r%d = r%d + r%d\n", c.rd, c.rs, c.rt); break;
-                case 2: printf("SUB r%d = r%d - r%d\n", c.rd, c.rs, c.rt); break;
-                case 4: printf("AND r%d = r%d & r%d\n", c.rd, c.rs, c.rt); break;
-                case 5: printf("OR r%d = r%d | r%d\n", c.rd, c.rs, c.rt); break;
+                case 0: printf("add $%d = $%d + $%d\n", c.rd, c.rs, c.rt); break;
+                case 2: printf("sub $%d = $%d - $%d\n", c.rd, c.rs, c.rt); break;
+                case 4: printf("and $%d = $%d & $%d\n", c.rd, c.rs, c.rt); break;
+                case 5: printf("or $%d = $%d | $%d\n", c.rd, c.rs, c.rt); break;
             }
             break;
+            
         case 2: // JUMP
             *PC = c.addr;
-            printf("JUMP para %d\n", c.addr);
+            printf("jump para %d\n", c.addr);
             return;
+            
         case 4: // ADDI
             (*aritmeticas)++;
             registradores[c.rt] = ULA(registradores[c.rs], c.imm, ctrl, &flag_zero);
-            printf("ADDI r%d = r%d + %d\n", c.rt, c.rs, c.imm);
+            printf("addi $%d = $%d + %d\n", c.rt, c.rs, c.imm);
             break;
+            
         case 8: // BEQ
             ULA(registradores[c.rs], registradores[c.rt], ctrl, &flag_zero);
 
             if(flag_zero) {
                 *PC = (*PC + 1) + c.imm;
-                printf("BEQ verdadeiro -> salto para %d\n", *PC);
+                printf("beq verdadeiro -> salto para %d\n", *PC);
                 return;
             }
 
-            printf("BEQ falso\n");
+            printf("beq falso\n");
             break;
+            
         case 11: // LW
             endereco = ULA(registradores[c.rs], c.imm, ctrl, &flag_zero);
 
             if (endereco >= 0 && endereco < 256) {
                 (*memoria_acesso)++;
                 registradores[c.rt] = memoria_dados[endereco];
-                printf("LW r%d = MEM[%d]\n", c.rt, endereco);
+                printf("lw $%d = MEM[%d]\n", c.rt, endereco);
             } else {
-                printf("Erro de memoria (LW)\n");
+                printf("Erro de memoria (lw)\n");
             }
             break;
+            
         case 15: // SW
             endereco = ULA(registradores[c.rs], c.imm, ctrl, &flag_zero);
 
             if (endereco >= 0 && endereco < 256) {
                 (*memoria_acesso)++;
                 memoria_dados[endereco] = registradores[c.rt];
-                printf("SW MEM[%d] = r%d\n", endereco, c.rt);
+                printf("sw MEM[%d] = $%d\n", endereco, c.rt);
             } else {
-                printf("Erro de memoria (SW)\n");
+                printf("Erro de memoria (sw)\n");
             }
             break;
 
@@ -164,6 +169,7 @@ void execute(struct decode c, int registradores[], int memoria_dados[], int *PC,
     }
     (*PC)++;
 }
+
 int controle_ULA(int opcode, int funct) {
     switch(opcode) {
     case 0: // tipo R
@@ -184,6 +190,7 @@ int controle_ULA(int opcode, int funct) {
         return -1;
     }
 }
+
 int ULA(int A, int B, int controle, int *flag) {
     int resultado = 0;
     
@@ -309,46 +316,47 @@ void salvar_asm(int memoria[]) {
     
     for(int PC = 0; PC < 256; PC++){
         int instrucao = memoria[PC];
+
         struct decode c = campos(instrucao);
         
         switch(c.opcode) {
-            case 0:
+            case 0: // Tipo R (ADD, SUB, AND, OR)
                 switch(c.funct) {
                     case 0: 
-                        fprintf(arquivo, "add r%d, r%d, r%d\n", c.rd, c.rs, c.rt); 
+                        fprintf(arquivo, "add $%d, $%d, $%d\n", c.rd, c.rs, c.rt); 
                         break;
                     case 2: 
-                        fprintf(arquivo, "sub r%d, r%d, r%d\n", c.rd, c.rs, c.rt); 
+                        fprintf(arquivo, "sub $%d, $%d, $%d\n", c.rd, c.rs, c.rt); 
                         break;
                     case 4: 
-                        fprintf(arquivo, "and r%d, r%d, r%d\n", c.rd, c.rs, c.rt); 
+                        fprintf(arquivo, "and $%d, $%d, $%d\n", c.rd, c.rs, c.rt); 
                         break;
                     case 5: 
-                        fprintf(arquivo, "or r%d, r%d, r%d\n", c.rd, c.rs, c.rt); 
+                        fprintf(arquivo, "or $%d, $%d, $%d\n", c.rd, c.rs, c.rt); 
                         break;
                     default: 
                         fprintf(arquivo, "Instrucao invalida\n");
                 }
                 break;
                 
-            case 4: 
-                fprintf(arquivo, "addi r%d, r%d, %d\n", c.rt, c.rs, c.imm); 
+            case 4: // ADDI
+                fprintf(arquivo, "addi $%d, $%d, %d\n", c.rt, c.rs, c.imm); 
                 break;
                 
-            case 11: 
-                fprintf(arquivo, "lw r%d, %d(%d)\n", c.rt, c.imm, c.rs); 
+            case 11: // LW
+                fprintf(arquivo, "lw $%d, %d($%d)\n", c.rt, c.imm, c.rs); 
                 break;
                 
-            case 15: 
-                fprintf(arquivo, "sw r%d, %d(%d)\n", c.rt, c.imm, c.rs); 
+            case 15: // SW
+                fprintf(arquivo, "sw $%d, %d($%d)\n", c.rt, c.imm, c.rs); 
                 break;
                 
-            case 8: 
-                fprintf(arquivo, "beq r%d, r%d, %d\n", c.rs, c.rt, c.imm); 
+            case 8: // BEQ
+                fprintf(arquivo, "beq $%d, $%d, %d\n", c.rs, c.rt, c.imm); 
                 break;
                 
-            case 2: 
-                fprintf(arquivo, "j %d\n", c.addr); 
+            case 2: // JUMP
+                fprintf(arquivo, "jump %d\n", c.addr); 
                 break;
                 
             default: 
@@ -357,29 +365,22 @@ void salvar_asm(int memoria[]) {
     }
     
     fclose(arquivo);
-    printf("Arquivo programa.asm salvo!\n");
+    printf("Arquivo programa.asm salvo com sucesso!\n");
 }
 
-struct EstadoMaquina historico[999]; 
-int passo_atual = 0; 
-
-void salvar_estado(int PC_atual, int registradores[], int memoria_dados[]) {
-    if (passo_atual >= 998) {
-        return;
-    }
-    
-    historico[passo_atual].PC = PC_atual;
+void salvar_estado(int PC_atual, int registradores[], int memoria_dados[], struct EstadoMaquina historico[], int *passo_atual) {
+    historico[*passo_atual].PC = PC_atual;
     
     for(int i = 0; i < 8; i++) {
-        historico[passo_atual].registradores[i] = registradores[i];
+        historico[*passo_atual].registradores[i] = registradores[i];
     }
     
     for(int i = 0; i < 256; i++) {
-        historico[passo_atual].memoria_dados[i] = memoria_dados[i];
+        historico[*passo_atual].memoria_dados[i] = memoria_dados[i];
     }
 }
 
-void step(int memoria_instrucao[], int memoria_dados[], int registradores[], int *PC, int *arit, int *mem) {
+void step(int memoria_instrucao[], int memoria_dados[], int registradores[], int *PC, int *arit, int *mem, struct EstadoMaquina historico[], int *passo_atual) {
     int instrucao_atual = fetch(memoria_instrucao, *PC);
     
     if (instrucao_atual == 0 || *PC >= 256) {
@@ -387,26 +388,26 @@ void step(int memoria_instrucao[], int memoria_dados[], int registradores[], int
         return;
     }
     
-    salvar_estado(*PC, registradores, memoria_dados);
-    passo_atual++;
+    salvar_estado(*PC, registradores, memoria_dados, historico, passo_atual);
+    (*passo_atual)++;
     
     struct decode c = campos(instrucao_atual);
     printf("\n[STEP] PC=%d | Opcode=%d\n", *PC, c.opcode);
     execute(c, registradores, memoria_dados, PC, arit, mem);
 }
 
-void back(int registradores[], int memoria_dados[], int *PC) {
-    if (passo_atual > 0) {
-        passo_atual--;
+void back(int registradores[], int memoria_dados[], int *PC, struct EstadoMaquina historico[], int *passo_atual) {
+    if (*passo_atual > 0) {
+        (*passo_atual)--;
         
-        *PC = historico[passo_atual].PC;
+        *PC = historico[*passo_atual].PC;
         
         for(int i = 0; i < 8; i++) {
-            registradores[i] = historico[passo_atual].registradores[i];
+            registradores[i] = historico[*passo_atual].registradores[i];
         }
         
         for(int i = 0; i < 256; i++) {
-            memoria_dados[i] = historico[passo_atual].memoria_dados[i];
+            memoria_dados[i] = historico[*passo_atual].memoria_dados[i];
         }
         
         printf("\nBack executado, PC restaurado para %d\n", *PC);
@@ -415,19 +416,16 @@ void back(int registradores[], int memoria_dados[], int *PC) {
     }
 }
 
-void run(int memoria_instrucao[], int memoria_dados[], int registradores[], int *PC, int *arit, int *mem) {
+void run(int memoria_instrucao[], int memoria_dados[], int registradores[], int *PC, int *arit, int *mem, struct EstadoMaquina historico[], int *passo_atual) {
     int total = 0;
     
     printf("\n--- Executando ---\n");
     
     while (*PC < 256 && fetch(memoria_instrucao, *PC) != 0) {
-        if (passo_atual >= 998) {
-            printf("\nO programa esta em loop, forcando parada.");
-            break;
-        }        
-        step(memoria_instrucao, memoria_dados, registradores, PC, arit, mem);
+        step(memoria_instrucao, memoria_dados, registradores, PC, arit, mem, historico, passo_atual);
         total++;
-    }    
+    }
+
     printf("\nTotal de Instrucoes: %d", total);
     printf("\nAritmeticas: %d", *arit);
     printf("\nMemoria: %d", *mem);
