@@ -233,6 +233,8 @@ void imprimir_memoria_instrucoes(int memoria[]) {
         struct decode c = campos(instrucao);
 
 printf("  |  ");
+    switch(c.opcode) {
+        case 0:
     switch(c.funct) {
         case 0:
             printf("ADD r%d = r%d + r%d", c.rd, c.rs, c.rt);
@@ -248,6 +250,7 @@ printf("  |  ");
             break;
         default:
             printf("Tipo R invalido");
+}
             break;
         case 4:
             printf("ADDI r%d = r%d + %d", c.rt, c.rs, c.imm);
@@ -274,7 +277,6 @@ printf("  |  ");
         printf("\n");
     }
 }
-
 void imprimir_memoria_dados(int memoria[]) {
     printf("\n--- Memoria de Dados (Decimal) ---\n");
     for(int i = 0; i < 256; i++) {
@@ -380,6 +382,7 @@ void salvar_estado(int PC_atual, int registradores[], int memoria_dados[], struc
 }
 
 void step(int memoria_instrucao[], int memoria_dados[], int registradores[], int *PC, int *arit, int *mem, struct EstadoMaquina historico[], int *passo_atual, int *jumps) {
+    
     if (*PC >= 256) {
         printf("Limite fisico da Memoria de Instrucoes atingido!\n");
         return;
