@@ -380,13 +380,11 @@ void salvar_estado(int PC_atual, int registradores[], int memoria_dados[], struc
 }
 
 void step(int memoria_instrucao[], int memoria_dados[], int registradores[], int *PC, int *arit, int *mem, struct EstadoMaquina historico[], int *passo_atual, int *jumps) {
-    int instrucao_atual = fetch(memoria_instrucao, *PC);
-
     if (*PC >= 256) {
         printf("Limite fisico da Memoria de Instrucoes atingido!\n");
         return;
     }
-    
+    int instrucao_atual = fetch(memoria_instrucao, *PC);
     salvar_estado(*PC, registradores, memoria_dados, historico, passo_atual);
     (*passo_atual)++;
     
