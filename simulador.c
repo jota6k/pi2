@@ -134,7 +134,7 @@ void execute(struct decode c, int registradores[], int memoria_dados[], int *PC,
 
             if(flag_zero) {
                 *PC = (*PC + 1) + c.imm;
-                printf("beq verdadeiro -> salto para %d\n", *PC);
+                printf("beq verdadeiro $%d - $%d = 0, salto para %d\n", c.rs, c.rt, *PC);
                 return;
             }
 
