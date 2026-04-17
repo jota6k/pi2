@@ -94,7 +94,7 @@ struct decode campos(int instrucao){
     return c;
 }
 
-void execute(struct decode c, int registradores[], int memoria_dados[], int *PC, int *aritmeticas, int *memoria_acesso){
+void execute(struct decode c, int registradores[], int memoria_dados[], int *PC, int *aritmeticas, int *memoria_acesso, int *jumps){
     int flag_zero = 0;
     int endereco;
     int ctrl = controle_ULA(c.opcode, c.funct);
@@ -118,6 +118,7 @@ void execute(struct decode c, int registradores[], int memoria_dados[], int *PC,
             break;
             
         case 2: // JUMP
+            (*jumps)++;
             *PC = c.addr;
             printf("jump para %d\n", c.addr);
             return;
@@ -185,7 +186,7 @@ int controle_ULA(int opcode, int funct) {
     case 4:  // ADDI
         return 0;
     case 8: // BEQ
-        return 2;
+        return 2; // sub para fazer a comparação
     default:
         return -1;
     }
@@ -195,7 +196,7 @@ int ULA(int A, int B, int controle, int *flag) {
     int resultado = 0;
     
     switch(controle) {
-        case 0: 
+        case 0:
             resultado = A + B; 
             break;
         case 2: 
@@ -380,11 +381,11 @@ void salvar_estado(int PC_atual, int registradores[], int memoria_dados[], struc
     }
 }
 
-void step(int memoria_instrucao[], int memoria_dados[], int registradores[], int *PC, int *arit, int *mem, struct EstadoMaquina historico[], int *passo_atual) {
+void step(int memoria_instrucao[], int memoria_dados[], int registradores[], int *PC, int *arit, int *mem, struct EstadoMaquina historico[], int *passo_atual, int *jumps) {
     int instrucao_atual = fetch(memoria_instrucao, *PC);
-    
-    if (instrucao_atual == 0 || *PC >= 256) {
-        printf("Nao ha mais instrucoes para executar.\n");
+
+    if (*PC >= 256) {
+        printf("Limite fisico da Memoria de Instrucoes atingido!\n");
         return;
     }
     
@@ -393,7 +394,7 @@ void step(int memoria_instrucao[], int memoria_dados[], int registradores[], int
     
     struct decode c = campos(instrucao_atual);
     printf("\n[STEP] PC=%d | Opcode=%d\n", *PC, c.opcode);
-    execute(c, registradores, memoria_dados, PC, arit, mem);
+    execute(c, registradores, memoria_dados, PC, arit, mem, jumps);
 }
 
 void back(int registradores[], int memoria_dados[], int *PC, struct EstadoMaquina historico[], int *passo_atual) {
@@ -416,18 +417,19 @@ void back(int registradores[], int memoria_dados[], int *PC, struct EstadoMaquin
     }
 }
 
-void run(int memoria_instrucao[], int memoria_dados[], int registradores[], int *PC, int *arit, int *mem, struct EstadoMaquina historico[], int *passo_atual) {
+void run(int memoria_instrucao[], int memoria_dados[], int registradores[], int *PC, int *arit, int *mem, struct EstadoMaquina historico[], int *passo_atual, int *jumps) {
     int total = 0;
     
     printf("\n--- Executando ---\n");
     
-    while (*PC < 256 && fetch(memoria_instrucao, *PC) != 0) {
-        step(memoria_instrucao, memoria_dados, registradores, PC, arit, mem, historico, passo_atual);
+    while (*PC < 256) {
+        step(memoria_instrucao, memoria_dados, registradores, PC, arit, mem, historico, passo_atual, jumps);
         total++;
     }
 
     printf("\nTotal de Instrucoes: %d", total);
     printf("\nAritmeticas: %d", *arit);
     printf("\nMemoria: %d", *mem);
+    printf("\nJumps: %d", *jumps);
     printf("\nPC Final: %d\n", *PC);
 }
