@@ -233,8 +233,6 @@ void imprimir_memoria_instrucoes(int memoria[]) {
         struct decode c = campos(instrucao);
 
 printf("  |  ");
-    switch(c.opcode) {
-        case 0:
     switch(c.funct) {
         case 0:
             printf("ADD r%d = r%d + r%d", c.rd, c.rs, c.rt);
@@ -250,7 +248,6 @@ printf("  |  ");
             break;
         default:
             printf("Tipo R invalido");
-}
             break;
         case 4:
             printf("ADDI r%d = r%d + %d", c.rt, c.rs, c.imm);
@@ -277,6 +274,7 @@ printf("  |  ");
         printf("\n");
     }
 }
+
 void imprimir_memoria_dados(int memoria[]) {
     printf("\n--- Memoria de Dados (Decimal) ---\n");
     for(int i = 0; i < 256; i++) {
