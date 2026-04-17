@@ -9,6 +9,7 @@ int main() {
     int PC = 0;
     int aritmeticas = 0;
     int memoria_acesso = 0;
+    int jumps = 0;
     int op;
     char nome_mem[50];
     char nome_dat[50];
@@ -66,10 +67,10 @@ int main() {
                 printf("Arquivo saidaDados.dat salvo\n");
                 break;
             case 8:
-                run(memoria_instrucao, memoria_dados, registradores, &PC, &aritmeticas, &memoria_acesso, historico, &passo_atual);
+                run(memoria_instrucao, memoria_dados, registradores, &PC, &aritmeticas, &memoria_acesso, historico, &passo_atual, &jumps);
                 break;
             case 9:
-                step(memoria_instrucao, memoria_dados, registradores, &PC, &aritmeticas, &memoria_acesso, historico, &passo_atual);
+                step(memoria_instrucao, memoria_dados, registradores, &PC, &aritmeticas, &memoria_acesso, historico, &passo_atual, &jumps);
                 break;
             case 10:
                 back(registradores, memoria_dados, &PC, historico, &passo_atual);
