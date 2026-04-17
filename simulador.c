@@ -185,7 +185,7 @@ int controle_ULA(int opcode, int funct) {
     case 4:  // ADDI
         return 0;
     case 8: // BEQ
-        return 2; // sub para fazer a comparação
+        return 2;
     default:
         return -1;
     }
