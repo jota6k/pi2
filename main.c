@@ -15,11 +15,11 @@ int main() {
     char nome_dat[50];
     struct EstadoMaquina historico[999];
     int passo_atual = 0;
-
+    int total = 0;
     inicializar_registradores(registradores);
     
     do {
-        printf("\n--- Menu do Simulador Mini MIPS ---\n");
+        printf("\n-------------- Menu do Simulador Mini MIPS -----------------\n");
         printf("1 - Carregar memoria de instrucoes (.mem)\n");
         printf("2 - Carregar memoria de dados (.dat)\n");
         printf("3 - Imprimir memorias (instrucoes e dados)\n");
@@ -30,7 +30,9 @@ int main() {
         printf("8 - Executar programa (Run)\n");
         printf("9 - Executar uma instrucao (Step)\n");
         printf("10 - Voltar uma instrucao (Back)\n");
-        printf("0 - Sair\n");
+        printf("11 - Carregar estatisticas\n");
+        printf("------------------------------------------------------------\n");
+        printf("\n0 - Sair\n");
         printf("Escolha: ");
         
         if (scanf("%d", &op) != 1) {
@@ -68,12 +70,22 @@ int main() {
                 break;
             case 8:
                 run(memoria_instrucao, memoria_dados, registradores, &PC, &aritmeticas, &memoria_acesso, historico, &passo_atual, &jumps);
+                total = aritmeticas + memoria_acesso + jumps;
                 break;
             case 9:
                 step(memoria_instrucao, memoria_dados, registradores, &PC, &aritmeticas, &memoria_acesso, historico, &passo_atual, &jumps);
+                total++;
                 break;
             case 10:
                 back(registradores, memoria_dados, &PC, historico, &passo_atual);
+                total--;
+                break;
+            case 11:
+                printf("\nTotal de Instrucoes: %d", total);
+                printf("\nAritmeticas: %d", aritmeticas);
+                printf("\nMemoria: %d", memoria_acesso);
+                printf("\nJumps: %d", jumps);
+                printf("\nPC Final: %d\n", PC);
                 break;
             case 0:
                 printf("Programa encerrado\n");
