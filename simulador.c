@@ -269,7 +269,7 @@ printf("  |  ");
             break;
 
         case 2:
-            printf("JUMP %d", c.addr);
+            printf("J %d", c.addr);
             break;
         default:
                 printf("Instrucao invalida");
@@ -357,7 +357,7 @@ void salvar_asm(int memoria[]) {
                 break;
                 
             case 2: // JUMP
-                fprintf(arquivo, "jump %d\n", c.addr); 
+                fprintf(arquivo, "j %d\n", c.addr); 
                 break;
                 
             default: 
@@ -412,7 +412,7 @@ void back(int registradores[], int memoria_dados[], int *PC, struct EstadoMaquin
         
         printf("\nBack executado, PC restaurado para %d\n", *PC);
     } else {
-        printf("\nErro: vc esta no inicio do programa!\n");
+        printf("\nErro: voce esta no inicio do programa!\n");
     }
 }
 
